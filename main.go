@@ -3,12 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 )
 
 type smugMugConf struct {
-	apiKey      string
-	apiSecret   string
 	username    string
 	destination string
 	galleries   []gallery
@@ -21,13 +20,27 @@ type photo struct{}
 func main() {
 	conf := parseArguments()
 
-	conf.checkDestination()
 	// Check exising and writeability of destination folder
-	// Get user root node
-	// Iterate over all nodes and collect galleries
-	// For each gallery, collect photos info
-	// Verify if already existing, download if not
+	conf.checkDestination()
 
+	// Get user albums
+	fmt.Printf("Getting albums for user %s...\n", conf.username)
+	albums, err := conf.getAlbums()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Found %d albums\n", len(*albums))
+
+	// Iterate over all albums and:
+	// - create folder
+	// - iterate over all images
+	//    - if existing, skip
+	//    - if not, download
+	for _, a := range *albums {
+		createFolder(fmt.Sprintf("%s%s", conf.destination, a.URLPath))
+		// a.Uris.AlbumImages.URI
+	}
 }
 
 func (c *smugMugConf) checkDestination() {
@@ -40,14 +53,12 @@ func (c *smugMugConf) checkDestination() {
 func parseArguments() *smugMugConf {
 	conf := &smugMugConf{}
 
-	flag.StringVar(&conf.apiKey, "key", "", "API Key")
-	flag.StringVar(&conf.apiSecret, "secret", "", "API Secret")
 	flag.StringVar(&conf.username, "user", "", "SmugMug user to backup")
 	flag.StringVar(&conf.destination, "destination", "", "Folder to save backup to")
 
 	flag.Parse()
 
-	if flag.NFlag() < 4 {
+	if flag.NFlag() < 2 {
 		fmt.Println("Missing arguments. Use --help for info")
 		os.Exit(1)
 	}

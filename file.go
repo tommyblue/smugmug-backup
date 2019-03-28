@@ -2,11 +2,21 @@ package main
 
 import (
 	"errors"
+	"log"
 	"os"
 	"path"
 
 	"golang.org/x/sys/unix"
 )
+
+func createFolder(path string) {
+	_, err := os.Stat(path)
+
+	if err != nil {
+		log.Printf("Creating folder %s", path)
+		os.MkdirAll(path, os.ModePerm)
+	}
+}
 
 func checkFolderIsWritable(folderPath string) error {
 	if !path.IsAbs(folderPath) {
