@@ -44,3 +44,35 @@ type album struct {
 		// } `json:"AlbumDownload"`
 	} `json:"Uris"`
 }
+
+type albumImagesResponse struct {
+	Response struct {
+		URI        string       `json:"Uri"`
+		AlbumImage []albumImage `json:"AlbumImage"`
+		Pages      struct {
+			// Total          int    `json:"Total"`
+			// Start          int    `json:"Start"`
+			// Count          int    `json:"Count"`
+			// RequestedCount int    `json:"RequestedCount"`
+			// FirstPage      string `json:"FirstPage"`
+			// LastPage string `json:"LastPage"`
+			NextPage string `json:"NextPage"`
+			// PrevPage       string `json:"PrevPage"`
+		} `json:"Pages"`
+	} `json:"Response"`
+	// Code    int    `json:"Code"`
+	// Message string `json:"Message"`
+}
+
+type albumImage struct {
+	FileName    string `json:"FileName"`
+	ArchivedUri string `json:"ArchivedUri"`
+	// Uris    struct {
+	// 	LargestImage struct {
+	// 		URI string `json:"Uri"`
+	// 	} `json:"LargestImage"`
+	// 	// AlbumDownload struct {
+	// 	// 	URI string `json:"Uri"`
+	// 	// } `json:"AlbumDownload"`
+	// } `json:"Uris"`
+}

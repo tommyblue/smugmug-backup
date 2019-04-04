@@ -1,5 +1,9 @@
 # smugmug-backup
-Makes a full backup of a SmugMug account
+Makes a full backup of a SmugMug account.
+
+OAuth1 signature has been heavily inspired by https://github.com/gomodule/oauth1
+
+## Setup and run
 
 ```
 export API_KEY=""

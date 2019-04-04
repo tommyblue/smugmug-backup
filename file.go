@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -37,4 +39,32 @@ func checkFolderIsWritable(folderPath string) error {
 	}
 
 	return nil
+}
+
+func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
+	for _, image := range *images {
+		dest := fmt.Sprintf("%s/%s", folder, image.FileName)
+		if _, err := os.Stat(dest); err == nil {
+			fmt.Printf("File exists: %s\n", image.ArchivedUri)
+			continue
+		}
+		fmt.Printf("Getting %s\n", image.ArchivedUri)
+		response, err := makeAPICall(image.ArchivedUri)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer response.Body.Close()
+
+		file, err := os.Create(dest)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		_, err = io.Copy(file, response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Saved %s\n", dest)
+	}
 }

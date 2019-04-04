@@ -24,3 +24,18 @@ func (c *smugMugConf) getAlbums() (*[]album, error) {
 	}
 	return &albums, nil
 }
+
+func (c *smugMugConf) getAlbumImages(ImagesURL string) (*[]albumImage, error) {
+	var albumImages albumImagesResponse
+	var images []albumImage
+	c.get(ImagesURL, &albumImages)
+	images = append(images, albumImages.Response.AlbumImage...)
+	nextPage := albumImages.Response.Pages.NextPage
+	for nextPage != "" {
+		var albumImages albumImagesResponse
+		c.get(nextPage, &albumImages)
+		nextPage = albumImages.Response.Pages.NextPage
+		images = append(images, albumImages.Response.AlbumImage...)
+	}
+	return &images, nil
+}

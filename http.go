@@ -52,7 +52,7 @@ func makeAPICall(url string) (*http.Response, error) {
 		req, err := http.NewRequest("GET", url, nil)
 
 		// Auth header must be generate every time (nonce must change)
-		h, err := authorizationHeader()
+		h, err := authorizationHeader(url)
 		if err != nil {
 			panic(err)
 		}

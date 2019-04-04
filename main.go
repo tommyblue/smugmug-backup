@@ -10,12 +10,7 @@ import (
 type smugMugConf struct {
 	username    string
 	destination string
-	galleries   []gallery
-	photos      []photo
 }
-
-type gallery struct{}
-type photo struct{}
 
 func main() {
 	conf := parseArguments()
@@ -38,8 +33,13 @@ func main() {
 	//    - if existing, skip
 	//    - if not, download
 	for _, a := range *albums {
-		createFolder(fmt.Sprintf("%s%s", conf.destination, a.URLPath))
-		// a.Uris.AlbumImages.URI
+		folder := fmt.Sprintf("%s%s", conf.destination, a.URLPath)
+		createFolder(folder)
+		images, err := conf.getAlbumImages(a.Uris.AlbumImages.URI)
+		if err != nil {
+			log.Fatal(err)
+		}
+		conf.saveImages(images, folder)
 	}
 }
 
