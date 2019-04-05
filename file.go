@@ -43,28 +43,50 @@ func checkFolderIsWritable(folderPath string) error {
 
 func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 	for _, image := range *images {
-		dest := fmt.Sprintf("%s/%s", folder, image.FileName)
-		if _, err := os.Stat(dest); err == nil {
-			fmt.Printf("File exists: %s\n", image.ArchivedUri)
-			continue
+		if image.IsVideo {
+			c.saveVideo(&image, folder)
+		} else {
+			c.saveImage(&image, folder)
 		}
-		fmt.Printf("Getting %s\n", image.ArchivedUri)
-		response, err := makeAPICall(image.ArchivedUri)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer response.Body.Close()
-
-		file, err := os.Create(dest)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-
-		_, err = io.Copy(file, response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Saved %s\n", dest)
 	}
+}
+
+func (c *smugMugConf) saveImage(image *albumImage, folder string) {
+	dest := fmt.Sprintf("%s/%s", folder, image.FileName)
+	download(dest, image.ArchivedUri)
+}
+
+func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
+	dest := fmt.Sprintf("%s/%s", folder, image.FileName)
+
+	var albumVideo albumVideo
+	c.get(image.Uris.LargestVideo.Uri, &albumVideo)
+
+	download(dest, albumVideo.Response.LargestVideo.Url)
+}
+
+func download(dest, downloadURL string) {
+	if _, err := os.Stat(dest); err == nil {
+		fmt.Printf("File exists: %s\n", downloadURL)
+		return
+	}
+	fmt.Printf("Getting %s\n", downloadURL)
+
+	response, err := makeAPICall(downloadURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer response.Body.Close()
+
+	file, err := os.Create(dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Saved %s\n\n", dest)
 }

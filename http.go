@@ -88,7 +88,9 @@ func makeAPICall(url string) (*http.Response, error) {
 			}
 
 			if r.StatusCode == 429 {
+				// Header Retry-After tells the number of seconds until the end of the current window
 				log.Println("Got 429 too many requests, let's try to wait 10 seconds...")
+				log.Printf("Retry-After header: %s\n", r.Header.Get("Retry-After"))
 				time.Sleep(10 * time.Second)
 			}
 			continue
