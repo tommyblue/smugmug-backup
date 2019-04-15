@@ -65,10 +65,11 @@ type albumImagesResponse struct {
 }
 
 type albumImage struct {
-	FileName    string `json:"FileName"`
-	ArchivedUri string `json:"ArchivedUri"`
-	IsVideo     bool   `json:"IsVideo"`
-	Uris        struct {
+	FileName     string `json:"FileName"`
+	ArchivedSize int64  `json:"ArchivedSize"`
+	ArchivedUri  string `json:"ArchivedUri"`
+	IsVideo      bool   `json:"IsVideo"`
+	Uris         struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`
 		} `json: "Uris"`
@@ -84,7 +85,8 @@ type albumImage struct {
 type albumVideo struct {
 	Response struct {
 		LargestVideo struct {
-			Url string `json:"Url"`
+			Size int64  `json:"Size"`
+			Url  string `json:"Url"`
 		} `json:"LargestVideo"`
 	} `json:"Response"`
 }

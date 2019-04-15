@@ -53,7 +53,7 @@ func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 
 func (c *smugMugConf) saveImage(image *albumImage, folder string) {
 	dest := fmt.Sprintf("%s/%s", folder, image.FileName)
-	download(dest, image.ArchivedUri)
+	download(dest, image.ArchivedUri, image.ArchivedSize)
 }
 
 func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
@@ -62,13 +62,24 @@ func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
 	var albumVideo albumVideo
 	c.get(image.Uris.LargestVideo.Uri, &albumVideo)
 
-	download(dest, albumVideo.Response.LargestVideo.Url)
+	download(dest, albumVideo.Response.LargestVideo.Url, albumVideo.Response.LargestVideo.Size)
 }
 
-func download(dest, downloadURL string) {
+func sameFileSizes(path string, fileSize int64) bool {
+	fi, err := os.Stat(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fi.Size() == fileSize
+}
+
+func download(dest, downloadURL string, fileSize int64) {
+
 	if _, err := os.Stat(dest); err == nil {
-		fmt.Printf("File exists: %s\n", downloadURL)
-		return
+		if sameFileSizes(dest, fileSize) {
+			fmt.Printf("File exists with same size: %s\n", downloadURL)
+			return
+		}
 	}
 	fmt.Printf("Getting %s\n", downloadURL)
 
