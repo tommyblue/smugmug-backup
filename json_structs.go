@@ -10,8 +10,6 @@ type user struct {
 			} `json:"Uris"`
 		} `json:"User"`
 	} `json:"Response"`
-	// Code    int    `json:"Code"`
-	// Message string `json:"Message"`
 }
 
 type albumsResponse struct {
@@ -19,18 +17,9 @@ type albumsResponse struct {
 		URI   string  `json:"Uri"`
 		Album []album `json:"Album"`
 		Pages struct {
-			// Total          int    `json:"Total"`
-			// Start          int    `json:"Start"`
-			// Count          int    `json:"Count"`
-			// RequestedCount int    `json:"RequestedCount"`
-			// FirstPage      string `json:"FirstPage"`
-			// LastPage string `json:"LastPage"`
 			NextPage string `json:"NextPage"`
-			// PrevPage       string `json:"PrevPage"`
 		} `json:"Pages"`
 	} `json:"Response"`
-	// Code    int    `json:"Code"`
-	// Message string `json:"Message"`
 }
 
 type album struct {
@@ -39,9 +28,6 @@ type album struct {
 		AlbumImages struct {
 			URI string `json:"Uri"`
 		} `json:"AlbumImages"`
-		// AlbumDownload struct {
-		// 	URI string `json:"Uri"`
-		// } `json:"AlbumDownload"`
 	} `json:"Uris"`
 }
 
@@ -50,18 +36,9 @@ type albumImagesResponse struct {
 		URI        string       `json:"Uri"`
 		AlbumImage []albumImage `json:"AlbumImage"`
 		Pages      struct {
-			// Total          int    `json:"Total"`
-			// Start          int    `json:"Start"`
-			// Count          int    `json:"Count"`
-			// RequestedCount int    `json:"RequestedCount"`
-			// FirstPage      string `json:"FirstPage"`
-			// LastPage string `json:"LastPage"`
 			NextPage string `json:"NextPage"`
-			// PrevPage       string `json:"PrevPage"`
 		} `json:"Pages"`
 	} `json:"Response"`
-	// Code    int    `json:"Code"`
-	// Message string `json:"Message"`
 }
 
 type albumImage struct {
@@ -73,12 +50,6 @@ type albumImage struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`
 		} `json: "Uris"`
-		// 	LargestImage struct {
-		// 		URI string `json:"Uri"`
-		// 	} `json:"LargestImage"`
-		// 	// AlbumDownload struct {
-		// 	// 	URI string `json:"Uri"`
-		// 	// } `json:"AlbumDownload"`
 	} `json:"Uris"`
 }
 

@@ -5,7 +5,7 @@ Makes a full backup of a [SmugMug](https://www.smugmug.com/) account (images and
 The program loops over the images and videos of the user's albums and saves them in the destination
 folder, replicating the SmugMug paths.
 
-You can run the app multiple times, all exising files will be skipped.
+You can run the app multiple times, all exising files will be skipped if their sizes match.
 
 **Note on multiple runs**
 
