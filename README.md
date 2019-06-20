@@ -64,6 +64,9 @@ With all the four environment variables set, you can run the program with:
 $GOPATH/bin/smugmug-backup -user <username> -destination <path of downloads>
 ```
 
+The **username** can be found in the first part of the url in your SmugMug's homepage.
+In my case the url is https://tommyblue.smugmug.com/ and the username `tommyblue`
+
 I suggest to add `$GOPATH/bin` to the `$PATH` so you can avoid writing the full path of the program.
 
 ## Run without install
