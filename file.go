@@ -16,7 +16,9 @@ func createFolder(path string) {
 
 	if err != nil {
 		log.Printf("Creating folder %s", path)
-		os.MkdirAll(path, os.ModePerm)
+		if err := os.MkdirAll(path, os.ModePerm); err != nil {
+			panic("Cannot create folder")
+		}
 	}
 }
 
@@ -77,11 +79,11 @@ func download(dest, downloadURL string, fileSize int64) {
 
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
-			fmt.Printf("File exists with same size: %s\n", downloadURL)
+			debugMsg(fmt.Sprintf("File exists with same size: %s\n", downloadURL))
 			return
 		}
 	}
-	fmt.Printf("Getting %s\n", downloadURL)
+	logMsg(fmt.Sprintf("Getting %s\n", downloadURL))
 
 	response, err := makeAPICall(downloadURL)
 	if err != nil {
@@ -99,5 +101,5 @@ func download(dest, downloadURL string, fileSize int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Saved %s\n\n", dest)
+	logMsg(fmt.Sprintf("Saved %s\n\n", dest))
 }

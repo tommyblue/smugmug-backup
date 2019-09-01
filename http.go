@@ -82,15 +82,15 @@ func makeAPICall(url string) (*http.Response, error) {
 			errorsList = append(errorsList, errors.New(r.Status))
 			if i >= maxRetries {
 				for _, e := range errorsList {
-					log.Println(e)
+					logMsg(fmt.Sprintln(e))
 				}
 				return nil, errors.New("Too many errors")
 			}
 
 			if r.StatusCode == 429 {
 				// Header Retry-After tells the number of seconds until the end of the current window
-				log.Println("Got 429 too many requests, let's try to wait 10 seconds...")
-				log.Printf("Retry-After header: %s\n", r.Header.Get("Retry-After"))
+				logMsg(fmt.Sprintf("Got 429 too many requests, let's try to wait 10 seconds..."))
+				logMsg(fmt.Sprintf("Retry-After header: %s\n", r.Header.Get("Retry-After")))
 				time.Sleep(10 * time.Second)
 			}
 			continue
