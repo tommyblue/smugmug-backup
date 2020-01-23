@@ -43,6 +43,7 @@ type albumImagesResponse struct {
 
 type albumImage struct {
 	FileName     string `json:"FileName"`
+	ImageKey     string `json:"ImageKey"` // Use as unique ID if FileName is empty
 	ArchivedSize int64  `json:"ArchivedSize"`
 	ArchivedUri  string `json:"ArchivedUri"`
 	IsVideo      bool   `json:"IsVideo"`
@@ -52,6 +53,14 @@ type albumImage struct {
 			Uri string `json:"Uri"`
 		} `json: "Uris"`
 	} `json:"Uris"`
+}
+
+func (a *albumImage) Name() string {
+	name := a.FileName
+	if name == "" {
+		name = a.ImageKey
+	}
+	return name
 }
 
 type albumVideo struct {

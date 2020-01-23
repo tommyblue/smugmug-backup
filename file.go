@@ -49,7 +49,7 @@ func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 			if !image.Processing { // Skip videos if under processing
 				c.saveVideo(&image, folder)
 			} else {
-				log.Printf("Skipping video %s because under processing\n", image.FileName)
+				log.Printf("Skipping video %s because under processing\n", image.Name())
 			}
 		} else {
 			c.saveImage(&image, folder)
@@ -58,12 +58,20 @@ func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 }
 
 func (c *smugMugConf) saveImage(image *albumImage, folder string) {
-	dest := fmt.Sprintf("%s/%s", folder, image.FileName)
+	if image.Name() == "" {
+		log.Println("Unable to find valid file name, skipping..")
+		return
+	}
+	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 	download(dest, image.ArchivedUri, image.ArchivedSize)
 }
 
 func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
-	dest := fmt.Sprintf("%s/%s", folder, image.FileName)
+	if image.Name() == "" {
+		log.Println("Unable to find valid file name, skipping..")
+		return
+	}
+	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
 	var albumVideo albumVideo
 	c.get(image.Uris.LargestVideo.Uri, &albumVideo)
@@ -80,7 +88,6 @@ func sameFileSizes(path string, fileSize int64) bool {
 }
 
 func download(dest, downloadURL string, fileSize int64) {
-
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
 			debugMsg(fmt.Sprintf("File exists with same size: %s\n", downloadURL))

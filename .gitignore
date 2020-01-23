@@ -12,4 +12,5 @@
 *.out
 
 .envrc
-smugmug-backup
+
+/smugmug-backup
