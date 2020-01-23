@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const maxRetries = 3
@@ -31,7 +32,7 @@ func getJSON(url string, obj interface{}) error {
 		err = json.NewDecoder(resp.Body).Decode(&obj)
 		defer resp.Body.Close()
 		if err != nil {
-			log.Printf("%s: reading response\n[ERR] %s", url, err)
+			log.Errorf("%s: reading response\n[ERR] %s", url, err)
 			if i >= maxRetries {
 				return err
 			}
@@ -60,16 +61,16 @@ func makeAPICall(url string) (*http.Response, error) {
 			{name: "Accept", value: "application/json"},
 			{name: "Authorization", value: h},
 		}
-		// log.Fatal(headers)
+		log.Debug(headers)
 		addHeaders(req, headers)
 
 		r, err := client.Do(req)
 		if err != nil {
-			log.Printf("#%d %s: %s\n", i, url, err)
+			log.Debugf("#%d %s: %s\n", i, url, err)
 			errorsList = append(errorsList, err)
 			if i >= maxRetries {
 				for _, e := range errorsList {
-					log.Println(e)
+					log.Error(e)
 				}
 				return nil, errors.New("Too many errors")
 			}
@@ -82,15 +83,15 @@ func makeAPICall(url string) (*http.Response, error) {
 			errorsList = append(errorsList, errors.New(r.Status))
 			if i >= maxRetries {
 				for _, e := range errorsList {
-					logMsg(fmt.Sprintln(e))
+					log.Error(e)
 				}
 				return nil, errors.New("Too many errors")
 			}
 
 			if r.StatusCode == 429 {
 				// Header Retry-After tells the number of seconds until the end of the current window
-				logMsg(fmt.Sprintf("Got 429 too many requests, let's try to wait 10 seconds..."))
-				logMsg(fmt.Sprintf("Retry-After header: %s\n", r.Header.Get("Retry-After")))
+				log.Error("Got 429 too many requests, let's try to wait 10 seconds...")
+				log.Errorf("Retry-After header: %s\n", r.Header.Get("Retry-After"))
 				time.Sleep(10 * time.Second)
 			}
 			continue

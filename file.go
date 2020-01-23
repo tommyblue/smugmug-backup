@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
+
+	log "github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 )
@@ -15,7 +16,7 @@ func createFolder(path string) {
 	_, err := os.Stat(path)
 
 	if err != nil {
-		log.Printf("Creating folder %s", path)
+		log.Infof("Creating folder %s\n", path)
 		if err := os.MkdirAll(path, os.ModePerm); err != nil {
 			panic("Cannot create folder")
 		}
@@ -49,7 +50,7 @@ func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 			if !image.Processing { // Skip videos if under processing
 				c.saveVideo(&image, folder)
 			} else {
-				log.Printf("Skipping video %s because under processing\n", image.Name())
+				log.Infof("Skipping video %s because under processing\n", image.Name())
 			}
 		} else {
 			c.saveImage(&image, folder)
@@ -59,7 +60,7 @@ func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 
 func (c *smugMugConf) saveImage(image *albumImage, folder string) {
 	if image.Name() == "" {
-		log.Println("Unable to find valid file name, skipping..")
+		log.Warn("Unable to find valid file name, skipping..")
 		return
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
@@ -68,7 +69,7 @@ func (c *smugMugConf) saveImage(image *albumImage, folder string) {
 
 func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
 	if image.Name() == "" {
-		log.Println("Unable to find valid file name, skipping..")
+		log.Warn("Unable to find valid file name, skipping..")
 		return
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
@@ -90,11 +91,11 @@ func sameFileSizes(path string, fileSize int64) bool {
 func download(dest, downloadURL string, fileSize int64) {
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
-			debugMsg(fmt.Sprintf("File exists with same size: %s\n", downloadURL))
+			log.Debugf("File exists with same size: %s\n", downloadURL)
 			return
 		}
 	}
-	logMsg(fmt.Sprintf("Getting %s\n", downloadURL))
+	log.Infof("Getting %s\n", downloadURL)
 
 	response, err := makeAPICall(downloadURL)
 	if err != nil {
@@ -112,5 +113,5 @@ func download(dest, downloadURL string, fileSize int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logMsg(fmt.Sprintf("Saved %s\n\n", dest))
+	log.Infof("Saved %s\n", dest)
 }

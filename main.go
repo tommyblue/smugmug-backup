@@ -3,13 +3,27 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type smugMugConf struct {
 	username    string
 	destination string
+}
+
+func init() {
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(os.Stdout)
+
+	flag, isPresent := os.LookupEnv("DEBUG")
+	if isPresent && flag == "1" {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+
+	}
 }
 
 func main() {
@@ -19,13 +33,13 @@ func main() {
 	conf.checkDestination()
 
 	// Get user albums
-	fmt.Printf("Getting albums for user %s...\n", conf.username)
+	log.Infof("Getting albums for user %s...\n", conf.username)
 	albums, err := conf.getAlbums()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Found %d albums\n", len(*albums))
+	log.Infof("Found %d albums\n", len(*albums))
 
 	// Iterate over all albums and:
 	// - create folder
@@ -45,8 +59,7 @@ func main() {
 
 func (c *smugMugConf) checkDestination() {
 	if err := checkFolderIsWritable(c.destination); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
@@ -59,8 +72,7 @@ func parseArguments() *smugMugConf {
 	flag.Parse()
 
 	if flag.NFlag() < 2 {
-		fmt.Println("Missing arguments. Use --help for info")
-		os.Exit(1)
+		log.Fatal("Missing arguments. Use --help for info")
 	}
 
 	return conf

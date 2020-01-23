@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"io"
-	"log"
 	"net/url"
 	"os"
 	"sort"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var apiKey string
