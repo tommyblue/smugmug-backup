@@ -46,6 +46,7 @@ type albumImage struct {
 	ArchivedSize int64  `json:"ArchivedSize"`
 	ArchivedUri  string `json:"ArchivedUri"`
 	IsVideo      bool   `json:"IsVideo"`
+	Processing   bool   `json:"Processing"`
 	Uris         struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`

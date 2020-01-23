@@ -46,7 +46,11 @@ func checkFolderIsWritable(folderPath string) error {
 func (c *smugMugConf) saveImages(images *[]albumImage, folder string) {
 	for _, image := range *images {
 		if image.IsVideo {
-			c.saveVideo(&image, folder)
+			if !image.Processing { // Skip videos if under processing
+				c.saveVideo(&image, folder)
+			} else {
+				log.Printf("Skipping video %s because under processing\n", image.FileName)
+			}
 		} else {
 			c.saveImage(&image, folder)
 		}
