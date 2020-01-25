@@ -1,5 +1,7 @@
 # SmugMug backup
 
+![Go](https://github.com/tommyblue/smugmug-backup/workflows/Go/badge.svg)
+
 Makes a full backup of a [SmugMug](https://www.smugmug.com/) account (images and videos are supported).
 
 The program loops over the images and videos of the user's albums and saves them in the destination
