@@ -1,0 +1,13 @@
+name: Go Releases
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Go Release Binary
+      uses: ngs/go-release.action@v1.0.2
