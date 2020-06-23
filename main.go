@@ -9,8 +9,9 @@ import (
 )
 
 type smugMugConf struct {
-	username    string
-	destination string
+	username          string
+	destination       string
+	ignorefetcherrors bool
 }
 
 func init() {
@@ -68,6 +69,7 @@ func parseArguments() *smugMugConf {
 
 	flag.StringVar(&conf.username, "user", "", "SmugMug user to backup")
 	flag.StringVar(&conf.destination, "destination", "", "Folder to save backup to")
+	flag.BoolVar(&conf.ignorefetcherrors, "ignorefetcherrors", false, "Ignore Smugmug API fetch errors")
 
 	flag.Parse()
 

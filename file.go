@@ -64,7 +64,7 @@ func (c *smugMugConf) saveImage(image *albumImage, folder string) {
 		return
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
-	download(dest, image.ArchivedUri, image.ArchivedSize)
+	download(dest, image.ArchivedUri, image.ArchivedSize, c.ignorefetcherrors)
 }
 
 func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
@@ -77,7 +77,7 @@ func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
 	var albumVideo albumVideo
 	c.get(image.Uris.LargestVideo.Uri, &albumVideo)
 
-	download(dest, albumVideo.Response.LargestVideo.Url, albumVideo.Response.LargestVideo.Size)
+	download(dest, albumVideo.Response.LargestVideo.Url, albumVideo.Response.LargestVideo.Size, c.ignorefetcherrors)
 }
 
 func sameFileSizes(path string, fileSize int64) bool {
@@ -88,7 +88,7 @@ func sameFileSizes(path string, fileSize int64) bool {
 	return fi.Size() == fileSize
 }
 
-func download(dest, downloadURL string, fileSize int64) {
+func download(dest, downloadURL string, fileSize int64, ignorefetcherrors bool) {
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
 			log.Debugf("File exists with same size: %s\n", downloadURL)
@@ -99,7 +99,11 @@ func download(dest, downloadURL string, fileSize int64) {
 
 	response, err := makeAPICall(downloadURL)
 	if err != nil {
-		log.Fatal(err)
+		if ignorefetcherrors {
+			log.Errorf("%s: download failed with: %s", downloadURL, err)
+			return
+		}
+		log.Fatalf("%s: download failed with: %s", downloadURL, err)
 	}
 	defer response.Body.Close()
 
