@@ -53,10 +53,8 @@ export USER_SECRET="<secret>"
 To build and install the program:
 
 ```sh
-go get github.com/tommyblue/smugmug-backup
-cd $GOPATH/src/github.com/tommyblue/smugmug-backup
-go get ./...
-go install
+git clone git@github.com:tommyblue/smugmug-backup.git
+make build
 ```
 
 ## Run
@@ -64,7 +62,7 @@ go install
 With all the four environment variables set, you can run the program with:
 
 ```sh
-$GOPATH/bin/smugmug-backup -user <username> -destination <path of downloads>
+./smugmug-backup -user <username> -destination <path of downloads>
 ```
 
 The **username** can be found in the first part of the url in your SmugMug's homepage.
@@ -72,18 +70,12 @@ In my case the url is https://tommyblue.smugmug.com/ and the username `tommyblue
 
 I suggest adding `$GOPATH/bin` to the `$PATH` so you can avoid writing the full path of the program.
 
-## Run without install
-
-```
-go run *.go -user <username> -destination <path of downloads>
-```
-
 ## Debug for errors
 
 To increase the logging, export a `DEBUG=1` environment variable:
 
 ```sh
-DEBUG=1 $GOPATH/bin/smugmug-backup -user <username> -destination <path of downloads>
+DEBUG=1 ./smugmug-backup -user <username> -destination <path of downloads>
 ```
 
 ## Credits
