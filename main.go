@@ -12,6 +12,7 @@ type smugMugConf struct {
 	username          string
 	destination       string
 	ignorefetcherrors bool
+	r                 requestsHandler
 }
 
 func init() {
@@ -28,14 +29,18 @@ func init() {
 }
 
 func main() {
-	conf := parseArguments()
+	conf := &smugMugConf{
+		r: &smugmugHandler{},
+	}
+	conf.parseArguments()
 
 	// Check exising and writeability of destination folder
 	conf.checkDestination()
 
 	// Get user albums
 	log.Infof("Getting albums for user %s...\n", conf.username)
-	albums, err := conf.getAlbums()
+	user := conf.getUser()
+	albums, err := conf.getAlbums(user)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,18 +69,14 @@ func (c *smugMugConf) checkDestination() {
 	}
 }
 
-func parseArguments() *smugMugConf {
-	conf := &smugMugConf{}
-
-	flag.StringVar(&conf.username, "user", "", "SmugMug user to backup")
-	flag.StringVar(&conf.destination, "destination", "", "Folder to save backup to")
-	flag.BoolVar(&conf.ignorefetcherrors, "ignorefetcherrors", false, "Ignore Smugmug API fetch errors")
+func (c *smugMugConf) parseArguments() {
+	flag.StringVar(&c.username, "user", "", "SmugMug user to backup")
+	flag.StringVar(&c.destination, "destination", "", "Folder to save backup to")
+	flag.BoolVar(&c.ignorefetcherrors, "ignorefetcherrors", false, "Ignore Smugmug API fetch errors")
 
 	flag.Parse()
 
 	if flag.NFlag() < 2 {
 		log.Fatal("Missing arguments. Use --help for info")
 	}
-
-	return conf
 }

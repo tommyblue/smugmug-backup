@@ -18,7 +18,7 @@ type header struct {
 	value string
 }
 
-func (c *smugMugConf) get(url string, obj interface{}) error {
+func (s *smugmugHandler) get(url string, obj interface{}) error {
 	return getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
 }
 

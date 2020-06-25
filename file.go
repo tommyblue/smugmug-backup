@@ -75,7 +75,7 @@ func (c *smugMugConf) saveVideo(image *albumImage, folder string) {
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
 	var albumVideo albumVideo
-	c.get(image.Uris.LargestVideo.Uri, &albumVideo)
+	c.r.get(image.Uris.LargestVideo.Uri, &albumVideo)
 
 	download(dest, albumVideo.Response.LargestVideo.Url, albumVideo.Response.LargestVideo.Size, c.ignorefetcherrors)
 }
