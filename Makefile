@@ -5,7 +5,7 @@
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build: ## Build baker binary in the local env
+build: ## Build smugmug-backup binary in the local env
 	GOFLAGS=-mod=vendor go build -v .
 
 test-short: ## Run tests with -short flag in the local env
@@ -22,3 +22,15 @@ gofmt-write: ## Run gofmt locally overwriting files
 
 govet: ## Run go vet on the project
 	go vet ./...
+
+docker: ## Build docker image with current version of the code
+	docker build -t smugmug .
+
+docker-test-short: docker ## Run tests with -short flag with Docker
+	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go test -short -race ./...
+
+docker-test: docker ## Run tests with Docker
+	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go test -race ./...
+
+docker-build: docker ## Build the smugmug-backup linux binary /smugmug-backup-linux using Docker
+	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go build -v -o smugmug-backup-linux .
