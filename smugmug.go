@@ -11,16 +11,13 @@ func (c *smugMugConf) getAlbums() (*[]album, error) {
 	path := fmt.Sprintf("/api/v2/user/%s", c.username)
 	c.get(path, &u)
 
-	var a albumsResponse
 	var albums []album
-	c.get(u.Response.User.Uris.UserAlbums.URI, &a)
-	albums = append(albums, a.Response.Album...)
-	nextPage := a.Response.Pages.NextPage
-	for nextPage != "" {
+	url := u.Response.User.Uris.UserAlbums.URI
+	for url != "" {
 		var a albumsResponse
-		c.get(nextPage, &a)
-		nextPage = a.Response.Pages.NextPage
+		c.get(url, &a)
 		albums = append(albums, a.Response.Album...)
+		url = a.Response.Pages.NextPage
 	}
 	return &albums, nil
 }

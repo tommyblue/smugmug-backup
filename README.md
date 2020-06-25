@@ -53,7 +53,7 @@ export USER_SECRET="<secret>"
 To build and install the program:
 
 ```sh
-git clone git@github.com:tommyblue/smugmug-backup.git
+git clone https://github.com/tommyblue/smugmug-backup.git
 make build
 ```
 
