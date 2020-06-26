@@ -21,7 +21,7 @@ gofmt-write: ## Run gofmt locally overwriting files
 	gofmt -w -s $$(find . -name '*.go' | grep -v vendor)
 
 govet: ## Run go vet on the project
-	go vet ./...
+	GOFLAGS=-mod=vendor go vet ./...
 
 docker: ## Build docker image with current version of the code
 	docker build -t smugmug .
