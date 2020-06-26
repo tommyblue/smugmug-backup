@@ -23,9 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 
 
-## [v1.0.0](https://github.com/tommyblue/smugmug-backup/tree/v1.0.0) - 2020-01-25
+## [v0.0.1](https://github.com/tommyblue/smugmug-backup/tree/v0.0.1) - 2020-06-26
 
-First official release
+First release
 
 ### Features
 

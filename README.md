@@ -17,6 +17,10 @@ of the program while it's saving a file, it will exist but will also probably be
 I'd like to manage this situation, but in the meanwhile when you interrupt an execution, take notes
 of the last files shown in the console and check if they're valid, deleting them otherwise.
 
+## Releases
+
+Releases for multiple systems can be found in the [project releases page](https://github.com/tommyblue/smugmug-backup/releases)
+
 ## Credentials
 
 SmugMug requires OAuth1 authentication. OAuth1 requires 4 values: API key and secret you can get
@@ -57,18 +61,29 @@ git clone https://github.com/tommyblue/smugmug-backup.git
 make build
 ```
 
+More `make` commands are available, run `make help` to get help
 ## Run
 
 With all the four environment variables set, you can run the program with:
 
 ```sh
-./smugmug-backup -user <username> -destination <path of downloads>
+./smugmug-backup -user <username> -destination <path of downloads> -ignorefetcherrors
 ```
 
-The **username** can be found in the first part of the url in your SmugMug's homepage.
-In my case the url is https://tommyblue.smugmug.com/ and the username `tommyblue`
+### Command line options
 
-I suggest adding `$GOPATH/bin` to the `$PATH` so you can avoid writing the full path of the program.
+#### -user \<username\>
+
+The username can be found in the first part of the url in your SmugMug's homepage.  
+In my case the url is https://tommyblue.smugmug.com/ and the username is `tommyblue`.
+
+#### -destination \<path\>
+
+Local path to save SmugMug pictures and videos. If not empty, only new or changed files will be downloaded.
+
+#### -ignorefetcherrors
+
+Ignore Smugmug API fetch errors and go on with the sync. If not provided, exits at the first error.
 
 ## Debug for errors
 
@@ -83,3 +98,9 @@ DEBUG=1 ./smugmug-backup -user <username> -destination <path of downloads>
 OAuth1 signature has been heavily inspired by https://github.com/gomodule/oauth1
 
 The code in the `get_tokens` folder is a copy of https://gist.github.com/smugkarl/10046914
+
+## Bugs and contributing
+
+If you find a bug or want to suggest something, please [open an issue](https://github.com/tommyblue/smugmug-backup/issues/new).
+
+If you want to contribute to this project, fork the repo and open a pull-request. Contributing is more than welcome :smile:
