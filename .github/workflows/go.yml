@@ -14,11 +14,17 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
+      - name: gofmt
+        run: make gofmt
+
+      - name: govet
+        run: make govet
+
       - name: Test
-        run: GOFLAGS=-mod=vendor go test ./...
+        run: make test
 
       - name: Build
-        run: GOFLAGS=-mod=vendor go build -v .
+        run: make build
 
       - name: GoReleaser Action
         uses: goreleaser/goreleaser-action@v2
