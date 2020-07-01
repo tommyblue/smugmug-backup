@@ -9,14 +9,6 @@ folder, replicating the SmugMug paths.
 
 You can run the app multiple times, all exising files will be skipped if their sizes match.
 
-**Note on multiple runs**
-
-The app skips existing files but doesn't check their sizes. So if you interrupt a running execution
-of the program while it's saving a file, it will exist but will also probably be corrupted.
-
-I'd like to manage this situation, but in the meanwhile when you interrupt an execution, take notes
-of the last files shown in the console and check if they're valid, deleting them otherwise.
-
 ## Releases
 
 Releases for multiple systems can be found in the [project releases page](https://github.com/tommyblue/smugmug-backup/releases)
@@ -29,7 +21,7 @@ must obtain (they authorize the app to access the user's data).
 
 ### Obtain API keys
 
-Apply for an API key: https://api.smugmug.com/api/developer/apply
+Apply for an API key: [https://api.smugmug.com/api/developer/apply](https://api.smugmug.com/api/developer/apply)
 
 You'll get an API key and secret, save them as environment variables:
 
@@ -62,12 +54,13 @@ make build
 ```
 
 More `make` commands are available, run `make help` to get help
+
 ## Run
 
 With all the four environment variables set, you can run the program with:
 
 ```sh
-./smugmug-backup -user <username> -destination <path of downloads> -ignorefetcherrors
+./smugmug-backup -user <username> -destination <path of downloads>
 ```
 
 ### Command line options
@@ -75,15 +68,11 @@ With all the four environment variables set, you can run the program with:
 #### -user \<username\>
 
 The username can be found in the first part of the url in your SmugMug's homepage.  
-In my case the url is https://tommyblue.smugmug.com/ and the username is `tommyblue`.
+In my case the url is [https://tommyblue.smugmug.com/](https://tommyblue.smugmug.com/) and the username is `tommyblue`.
 
 #### -destination \<path\>
 
 Local path to save SmugMug pictures and videos. If not empty, only new or changed files will be downloaded.
-
-#### -ignorefetcherrors
-
-Ignore Smugmug API fetch errors and go on with the sync. If not provided, exits at the first error.
 
 ## Debug for errors
 
@@ -95,9 +84,9 @@ DEBUG=1 ./smugmug-backup -user <username> -destination <path of downloads>
 
 ## Credits
 
-OAuth1 signature has been heavily inspired by https://github.com/gomodule/oauth1
+OAuth1 signature has been heavily inspired by [https://github.com/gomodule/oauth1](https://github.com/gomodule/oauth1)
 
-The code in the `get_tokens` folder is a copy of https://gist.github.com/smugkarl/10046914
+The code in the `get_tokens` folder is a copy of [https://gist.github.com/smugkarl/10046914](https://gist.github.com/smugkarl/10046914)
 
 ## Bugs and contributing
 
