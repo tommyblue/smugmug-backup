@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
-- 
+- Add the album path to the images, so it's possible to better debug images errors
 
 ## [v0.0.2](https://github.com/tommyblue/smugmug-backup/tree/v0.0.2) - 2020-07-01
 
