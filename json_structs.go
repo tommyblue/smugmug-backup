@@ -51,7 +51,7 @@ type albumImage struct {
 	Uris         struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`
-		} `json:"Uris"`
+		} `json:"LargestVideo"`
 	} `json:"Uris"`
 }
 

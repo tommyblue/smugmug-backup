@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -18,13 +20,51 @@ type header struct {
 	value string
 }
 
+type smugmugHandler struct{}
+
 func (s *smugmugHandler) get(url string, obj interface{}) error {
+	if url == "" {
+		return errors.New("Can't get empty url")
+	}
 	return getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
+}
+
+func download(dest, downloadURL string, fileSize int64) error {
+	if _, err := os.Stat(dest); err == nil {
+		if sameFileSizes(dest, fileSize) {
+			log.Debug("File exists with same size:", downloadURL)
+			return nil
+		}
+	}
+	log.Info("Getting ", downloadURL)
+
+	response, err := makeAPICall(downloadURL)
+	if err != nil {
+		return fmt.Errorf("%s: download failed with: %s", downloadURL, err)
+	}
+	defer response.Body.Close()
+
+	// Create empty destination file
+	file, err := os.Create(dest)
+	if err != nil {
+		return fmt.Errorf("%s: file creation failed with: %s", dest, err)
+	}
+	defer file.Close()
+
+	// Copy the content to the file
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		return fmt.Errorf("%s: file content copy failed with: %s", dest, err)
+	}
+
+	log.Info("Saved", dest)
+	return nil
 }
 
 func getJSON(url string, obj interface{}) error {
 	var result interface{}
 	for i := 1; i <= maxRetries; i++ {
+		log.Debug("Calling ", url)
 		resp, err := makeAPICall(url)
 		if err != nil {
 			return err
@@ -32,7 +72,7 @@ func getJSON(url string, obj interface{}) error {
 		err = json.NewDecoder(resp.Body).Decode(&obj)
 		defer resp.Body.Close()
 		if err != nil {
-			log.Errorf("%s: reading response\n[ERR] %s", url, err)
+			log.Errorf("%s: reading response. %s", url, err)
 			if i >= maxRetries {
 				return err
 			}

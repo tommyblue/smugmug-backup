@@ -23,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 
 
+## [v0.0.2](https://github.com/tommyblue/smugmug-backup/tree/v0.0.2) - 2020-07-01
+
+### Changed
+
+- almost all functions now return an error instead of `panic` or `log.Fatal`
+- `ignorefetcherrors` command line option has been removed as now it's the default behaviour
+
+### Maintenance
+
+- Multiple refactorings
+
 ## [v0.0.1](https://github.com/tommyblue/smugmug-backup/tree/v0.0.1) - 2020-06-26
 
 First release
