@@ -64,7 +64,7 @@ func main() {
 		}
 
 		log.Debugf("[ALBUM IMAGES] %s", album.Uris.AlbumImages.URI)
-		images, err := conf.getAlbumImages(album.Uris.AlbumImages.URI)
+		images, err := conf.getAlbumImages(album.Uris.AlbumImages.URI, album.URLPath)
 		if err != nil {
 			log.Errorf("Cannot get album images for %s. Error: %v", album.Uris.AlbumImages.URI, err)
 			errors++

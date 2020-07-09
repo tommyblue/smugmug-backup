@@ -57,7 +57,7 @@ func download(dest, downloadURL string, fileSize int64) error {
 		return fmt.Errorf("%s: file content copy failed with: %s", dest, err)
 	}
 
-	log.Info("Saved", dest)
+	log.Info("Saved ", dest)
 	return nil
 }
 

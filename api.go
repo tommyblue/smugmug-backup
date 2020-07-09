@@ -32,7 +32,7 @@ func (c *smugMugConf) getAlbums(firstURI string) ([]album, error) {
 	return albums, nil
 }
 
-func (c *smugMugConf) getAlbumImages(firstURI string) ([]albumImage, error) {
+func (c *smugMugConf) getAlbumImages(firstURI string, albumPath string) ([]albumImage, error) {
 	uri := firstURI
 	var images []albumImage
 	for uri != "" {
@@ -40,7 +40,11 @@ func (c *smugMugConf) getAlbumImages(firstURI string) ([]albumImage, error) {
 		if err := c.req.get(uri, &a); err != nil {
 			return images, fmt.Errorf("Error getting album images from %s. Error: %v", uri, err)
 		}
-		images = append(images, a.Response.AlbumImage...)
+		// Loop over response in inject the albumPath and then append to the images
+		for _, i := range a.Response.AlbumImage {
+			i.AlbumPath = albumPath
+			images = append(images, i)
+		}
 		uri = a.Response.Pages.NextPage
 	}
 
@@ -72,7 +76,7 @@ func (c *smugMugConf) saveImage(image albumImage, folder string) error {
 
 func (c *smugMugConf) saveVideo(image albumImage, folder string) error {
 	if image.Processing { // Skip videos if under processing
-		return fmt.Errorf("Skipping video %s because under processing, %s\n", image.Name(), image.Uris.LargestVideo.Uri)
+		return fmt.Errorf("Skipping video %s because under processing, %#v\n", image.Name(), image)
 	}
 
 	if image.Name() == "" {

@@ -42,6 +42,7 @@ type albumImagesResponse struct {
 }
 
 type albumImage struct {
+	AlbumPath    string // From album.URLPath
 	FileName     string `json:"FileName"`
 	ImageKey     string `json:"ImageKey"` // Use as unique ID if FileName is empty
 	ArchivedSize int64  `json:"ArchivedSize"`

@@ -62,7 +62,7 @@ func TestGetAlbumImages(t *testing.T) {
 	c := &smugMugConf{
 		req: &albumImages{},
 	}
-	albums, err := c.getAlbumImages("someurl")
+	albums, err := c.getAlbumImages("someurl", "myAlbumPath")
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
