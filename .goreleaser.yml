@@ -3,9 +3,14 @@
 before:
   hooks:
 builds:
-- env:
-  - CGO_ENABLED=0
-  - GOFLAGS=-mod=vendor
+  -
+    goos:
+      - linux
+      - darwin
+      - windows
+    env:
+      - CGO_ENABLED=0
+      - GOFLAGS=-mod=vendor
 archives:
 - replacements:
     darwin: Darwin

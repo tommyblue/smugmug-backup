@@ -7,8 +7,6 @@ import (
 	"path"
 
 	log "github.com/sirupsen/logrus"
-
-	"golang.org/x/sys/unix"
 )
 
 func createFolder(path string) error {
@@ -27,7 +25,7 @@ func createFolder(path string) error {
 	return nil
 }
 
-func checkFolderIsWritable(folderPath string) error {
+func checkDestFolder(folderPath string) error {
 	if !path.IsAbs(folderPath) {
 		return errors.New("Destination path must be an absolute path")
 	}
@@ -39,10 +37,6 @@ func checkFolderIsWritable(folderPath string) error {
 
 	if !info.IsDir() {
 		return errors.New("Destination path isn't a directory")
-	}
-
-	if unix.Access(folderPath, unix.W_OK) != nil {
-		return errors.New("Destination path in not writeable")
 	}
 
 	return nil

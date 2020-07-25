@@ -34,8 +34,8 @@ func main() {
 	conf.parseArguments()
 
 	// Check exising and writeability of destination folder
-	if err := checkFolderIsWritable(conf.destination); err != nil {
-		log.Fatal("Can't write in the destination folder")
+	if err := checkDestFolder(conf.destination); err != nil {
+		log.Fatalf("Can't find in the destination folder: %v", err)
 	}
 
 	// Get user albums
