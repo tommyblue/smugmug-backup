@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 
+-
 
 ### Changed
 
@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - 
+
+### Maintenance
+
+- 
+
+## [v0.0.3](https://github.com/tommyblue/smugmug-backup/tree/v0.0.3) - 2020-07-25
+
+### Added
+
+- Windows support. Also build Windows binary on [release](https://github.com/tommyblue/smugmug-backup/releases)
 
 ### Maintenance
 
