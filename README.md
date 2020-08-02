@@ -32,6 +32,16 @@ export API_SECRET="<secret>"
 
 ### Obtain Tokens
 
+Once your app has been accepted by SmugMug and you got the API key and secret, then go to your [Account Settings > Privacy page](https://www.smugmug.com/app/account/settings/?#section=privacy) and scroll down to "Authorized Services", where you'll find the app and a link to see the tokens.  
+They must be exported as environment variables:
+
+```sh
+export USER_TOKEN="<Access Token>"
+export USER_SECRET="<Token Secret>"
+```
+
+#### Alternative ways to obtain the tokens
+
 Based on the examples from SmugMug (that you can find in the [get_tokens](./get_tokens) folder,
 I've written a small web app that can help everyone to obtain their user token and secret.
 
