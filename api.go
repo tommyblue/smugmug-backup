@@ -85,7 +85,7 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 	log.Debug(image.ArchivedUri)
-	return download(dest, image.ArchivedUri, image.ArchivedSize)
+	return w.downloadFn(dest, image.ArchivedUri, image.ArchivedSize)
 }
 
 // saveVideo saves a video to the given folder unless its name is empty od is still under processing
@@ -105,5 +105,5 @@ func (w *Worker) saveVideo(image albumImage, folder string) error {
 		return fmt.Errorf("Cannot get URI for video %+v. Error: %v", image, err)
 	}
 
-	return download(dest, v.Response.LargestVideo.Url, v.Response.LargestVideo.Size)
+	return w.downloadFn(dest, v.Response.LargestVideo.Url, v.Response.LargestVideo.Size)
 }

@@ -3,6 +3,7 @@ package smugmug
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -15,8 +16,9 @@ type Conf struct {
 
 // Worker actually implements the backup logic
 type Worker struct {
-	req requestsHandler
-	cfg *Conf
+	req        requestsHandler
+	cfg        *Conf
+	downloadFn func(string, string, int64) error
 }
 
 // New return a SmugMug backup configuration. It returns an error if it fails parsing
@@ -36,8 +38,9 @@ func New(cfg *Conf) (*Worker, error) {
 	}
 
 	return &Worker{
-		cfg: cfg,
-		req: &handler{},
+		cfg:        cfg,
+		req:        &handler{},
+		downloadFn: download,
 	}, nil
 }
 
@@ -59,7 +62,7 @@ func (w *Worker) Run() error {
 	//    - if not, download
 	var errors int
 	for _, album := range albums {
-		folder := fmt.Sprintf("%s%s", w.cfg.Destination, album.URLPath)
+		folder := filepath.Join(w.cfg.Destination, album.URLPath)
 
 		if err := createFolder(folder); err != nil {
 			log.WithError(err).Errorf("cannot create the destination folder %s", folder)
