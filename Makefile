@@ -6,7 +6,7 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 build: ## Build smugmug-backup binary in the local env
-	GOFLAGS=-mod=vendor go build -v .
+	GOFLAGS=-mod=vendor go build -v ./cmd/smugmug-backup/
 
 test-short: ## Run tests with -short flag in the local env
 	GOFLAGS=-mod=vendor go test -short -v -race ./...
@@ -33,4 +33,4 @@ docker-test: docker ## Run tests with Docker
 	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go test -race ./...
 
 docker-build: docker ## Build the smugmug-backup linux binary /smugmug-backup-linux using Docker
-	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go build -v -o smugmug-backup-linux .
+	docker run -t -v "$$PWD:/go/src/smugmug-backup" -e 'GOFLAGS=-mod=vendor' smugmug go build -v -o smugmug-backup-linux ./cmd/smugmug-backup/
