@@ -1,4 +1,4 @@
-package main
+package smugmug
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// maxRetries defines the number of http calls retries (in case of errors) before giving up
 const maxRetries = 3
 const baseAPIURL = "https://api.smugmug.com"
 
@@ -20,15 +21,18 @@ type header struct {
 	value string
 }
 
-type smugmugHandler struct{}
+type handler struct{}
 
-func (s *smugmugHandler) get(url string, obj interface{}) error {
+// get calls getJSON with the given url
+func (s *handler) get(url string, obj interface{}) error {
 	if url == "" {
 		return errors.New("Can't get empty url")
 	}
 	return getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
 }
 
+// download the resource (image or video) from the given url to the given destination, checking
+// if a file with the same size exists (and skipping the download in that case)
 func download(dest, downloadURL string, fileSize int64) error {
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
@@ -61,6 +65,7 @@ func download(dest, downloadURL string, fileSize int64) error {
 	return nil
 }
 
+// getJSON makes a http calls to the given url, trying to decode the JSON response on the given obj
 func getJSON(url string, obj interface{}) error {
 	var result interface{}
 	for i := 1; i <= maxRetries; i++ {
@@ -84,6 +89,7 @@ func getJSON(url string, obj interface{}) error {
 	return nil
 }
 
+// makeAPICall performs an HTTP call to the given url, returning the response
 func makeAPICall(url string) (*http.Response, error) {
 	client := &http.Client{}
 
@@ -143,8 +149,8 @@ func makeAPICall(url string) (*http.Response, error) {
 	return resp, nil
 }
 
+// addHeaders to the provided http request
 func addHeaders(req *http.Request, headers []header) {
-	// Add headers if provided
 	for _, h := range headers {
 		req.Header.Add(h.name, h.value)
 	}

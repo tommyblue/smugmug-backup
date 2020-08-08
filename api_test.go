@@ -1,4 +1,4 @@
-package main
+package smugmug
 
 import (
 	"testing"
@@ -24,15 +24,15 @@ func (c *albumMockHandler) get(url string, obj interface{}) error {
 }
 
 func TestGetAlbums(t *testing.T) {
-	c := &smugMugConf{
+	w := &Worker{
 		req: &albumMockHandler{},
 	}
-	albums, err := c.getAlbums("someurl")
+	albums, err := w.albums("someurl")
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
-	if c.req.(*albumMockHandler).called != 2 {
-		t.Errorf("Called, want 2, got %d", c.req.(*albumMockHandler).called)
+	if w.req.(*albumMockHandler).called != 2 {
+		t.Errorf("Called, want 2, got %d", w.req.(*albumMockHandler).called)
 	}
 	if len(albums) != 4 {
 		t.Errorf("Want 4, got %d", len(albums))
@@ -59,15 +59,15 @@ func (c *albumImages) get(url string, obj interface{}) error {
 }
 
 func TestGetAlbumImages(t *testing.T) {
-	c := &smugMugConf{
+	w := &Worker{
 		req: &albumImages{},
 	}
-	albums, err := c.getAlbumImages("someurl", "myAlbumPath")
+	albums, err := w.albumImages("someurl", "myAlbumPath")
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
-	if c.req.(*albumImages).called != 2 {
-		t.Errorf("Called, want 2, got %d", c.req.(*albumImages).called)
+	if w.req.(*albumImages).called != 2 {
+		t.Errorf("Called, want 2, got %d", w.req.(*albumImages).called)
 	}
 	if len(albums) != 4 {
 		t.Errorf("Want 4, got %d", len(albums))
