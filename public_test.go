@@ -69,8 +69,4 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
-
-	// if err := s.Run(); err != nil {
-	// 	log.Fatal(err)
-	// }
 }
