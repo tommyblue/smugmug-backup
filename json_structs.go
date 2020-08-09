@@ -1,4 +1,4 @@
-package main
+package smugmug
 
 type user struct {
 	Response struct {

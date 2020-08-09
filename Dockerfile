@@ -18,12 +18,12 @@ RUN sed -e "/deb-src/d" -i /etc/apt/sources.list \
     && rm -rf /.root/cache \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://dl.google.com/go/go1.14.4.linux-amd64.tar.gz ./go.tar.gz
+ADD https://dl.google.com/go/go1.14.7.linux-amd64.tar.gz ./go.tar.gz
 
-RUN echo "aed845e4185a0b2a3c3d5e1d0a35491702c55889192bb9c30e67a3de6849c067 go.tar.gz" | sha256sum -c - && \
+RUN echo "0f215de06019a054a3da46a0722989986c956d719c7a0a8fc38a5f3c216d6f6b go.tar.gz" | sha256sum -c - && \
     tar -C /usr/local -xzf go.tar.gz && \
     rm ./go.tar.gz
 
 ADD . $APP
 WORKDIR $APP
-RUN go build -mod=vendor -i -v -o $GOBIN/smugmug-backup .
+RUN go build -mod=vendor -i -v -o $GOBIN/smugmug-backup ./cmd/smugmug-backup/

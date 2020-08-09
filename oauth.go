@@ -1,4 +1,4 @@
-package main
+package smugmug
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"io"
 	"net/url"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,10 +18,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var apiKey string
-var apiSecret string
-var token string
-var secret string
+type oauthConf struct {
+	apiKey     string
+	apiSecret  string
+	userToken  string
+	userSecret string
+}
 
 var oauthKeys = []string{
 	"oauth_consumer_key",
@@ -44,11 +45,6 @@ func init() {
 		// fallback to time if rand reader is broken
 		nonceCounter = uint64(time.Now().UnixNano())
 	}
-
-	apiKey = os.Getenv("API_KEY")
-	apiSecret = os.Getenv("API_SECRET")
-	token = os.Getenv("USER_TOKEN")
-	secret = os.Getenv("USER_SECRET")
 }
 
 // nonce returns a unique string.
@@ -56,17 +52,26 @@ func nonce() string {
 	return strconv.FormatUint(atomic.AddUint64(&nonceCounter, 1), 16)
 }
 
-func authorizationHeader(url string) (string, error) {
+func newOauthConf(apiKey, apiSecret, userToken, userSecret string) *oauthConf {
+	return &oauthConf{
+		apiKey:     apiKey,
+		apiSecret:  apiSecret,
+		userToken:  userToken,
+		userSecret: userSecret,
+	}
+}
+
+func (cfg *oauthConf) authorizationHeader(url string) (string, error) {
 	var oauthParams = map[string]string{
-		"oauth_consumer_key":     apiKey,
+		"oauth_consumer_key":     cfg.apiKey,
 		"oauth_signature_method": "HMAC-SHA1",
 		"oauth_version":          "1.0",
-		"oauth_token":            token,
+		"oauth_token":            cfg.userToken,
 		"oauth_timestamp":        strconv.FormatInt(time.Now().Unix(), 10),
 		"oauth_nonce":            nonce(),
 	}
 
-	signature := getHMACSignature(url, oauthParams)
+	signature := cfg.getHMACSignature(url, oauthParams)
 	oauthParams["oauth_signature"] = signature
 	var h []byte
 	// Append parameters in a fixed order to support testing.
@@ -87,15 +92,15 @@ func authorizationHeader(url string) (string, error) {
 	return string(h), nil
 }
 
-func getHMACSignature(urlStr string, oauthParams map[string]string) string {
-	key := encode(apiSecret, false)
+func (cfg *oauthConf) getHMACSignature(urlStr string, oauthParams map[string]string) string {
+	key := encode(cfg.apiSecret, false)
 	key = append(key, '&')
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// if r.credentials != nil {
-	key = append(key, encode(secret, false)...)
+	key = append(key, encode(cfg.userSecret, false)...)
 	// }
 	h := hmac.New(sha1.New, key)
 	writeBaseString(h, "GET", u, url.Values{}, oauthParams)
@@ -104,11 +109,11 @@ func getHMACSignature(urlStr string, oauthParams map[string]string) string {
 	return signature
 }
 
-func getSignature() string {
-	rawSignature := encode(apiSecret, false)
+func (cfg *oauthConf) getSignature() string {
+	rawSignature := encode(cfg.apiSecret, false)
 	rawSignature = append(rawSignature, '&')
 	// if r.credentials != nil {
-	rawSignature = append(rawSignature, encode(secret, false)...)
+	rawSignature = append(rawSignature, encode(cfg.userSecret, false)...)
 	// }
 	return string(rawSignature)
 }
