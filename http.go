@@ -21,19 +21,27 @@ type header struct {
 	value string
 }
 
-type handler struct{}
+type handler struct {
+	oauth *oauthConf
+}
+
+func newHTTPHandler(apiKey, apiSecret, userToken, userSecret string) *handler {
+	return &handler{
+		oauth: newOauthConf(apiKey, apiSecret, userToken, userSecret),
+	}
+}
 
 // get calls getJSON with the given url
 func (s *handler) get(url string, obj interface{}) error {
 	if url == "" {
 		return errors.New("Can't get empty url")
 	}
-	return getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
+	return s.getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
 }
 
 // download the resource (image or video) from the given url to the given destination, checking
 // if a file with the same size exists (and skipping the download in that case)
-func download(dest, downloadURL string, fileSize int64) error {
+func (s *handler) download(dest, downloadURL string, fileSize int64) error {
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
 			log.Debug("File exists with same size:", downloadURL)
@@ -42,7 +50,7 @@ func download(dest, downloadURL string, fileSize int64) error {
 	}
 	log.Info("Getting ", downloadURL)
 
-	response, err := makeAPICall(downloadURL)
+	response, err := s.makeAPICall(downloadURL)
 	if err != nil {
 		return fmt.Errorf("%s: download failed with: %s", downloadURL, err)
 	}
@@ -66,11 +74,11 @@ func download(dest, downloadURL string, fileSize int64) error {
 }
 
 // getJSON makes a http calls to the given url, trying to decode the JSON response on the given obj
-func getJSON(url string, obj interface{}) error {
+func (s *handler) getJSON(url string, obj interface{}) error {
 	var result interface{}
 	for i := 1; i <= maxRetries; i++ {
 		log.Debug("Calling ", url)
-		resp, err := makeAPICall(url)
+		resp, err := s.makeAPICall(url)
 		if err != nil {
 			return err
 		}
@@ -90,7 +98,7 @@ func getJSON(url string, obj interface{}) error {
 }
 
 // makeAPICall performs an HTTP call to the given url, returning the response
-func makeAPICall(url string) (*http.Response, error) {
+func (s *handler) makeAPICall(url string) (*http.Response, error) {
 	client := &http.Client{}
 
 	var resp *http.Response
@@ -99,7 +107,7 @@ func makeAPICall(url string) (*http.Response, error) {
 		req, err := http.NewRequest("GET", url, nil)
 
 		// Auth header must be generate every time (nonce must change)
-		h, err := authorizationHeader(url)
+		h, err := s.oauth.authorizationHeader(url)
 		if err != nil {
 			panic(err)
 		}

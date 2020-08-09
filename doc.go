@@ -19,25 +19,45 @@
 		)
 
 		func main() {
-			s, err := smugmug.New(&smugmug.Conf{
-				Username: "myUsername",
-				Destination: "/path/to/backup/",
-			})
+			cfg, err := smugmug.ReadConf()
+			if err != nil {
+				log.WithError(err).Fatal("Configuration error")
+			}
+
+			wrk, err := smugmug.New(cfg)
 			if err != nil {
 				log.WithError(err).Fatal("Can't initialize the package")
 			}
 
-			if err := s.Run(); err != nil {
+			if err := wrk.Run(); err != nil {
 				log.Fatal(err)
 			}
 		}
 
-	The package expects to find the SmugMug API credentials as
-	environmental variables:
+	The app reads its configuration from ./config.toml or $HOME/.smgmg/config.toml.
 
-		API_KEY="<key>"
-		API_SECRET="<secret>"
-		USER_TOKEN="<Access Token>"
-		USER_SECRET="<Token Secret>"
+	The supported configuration keys/values are the following:
+
+		[authentication]
+		username = "<SmugMug username>"
+		api_key = "<API Key>"
+		api_secret = "<API Secret>"
+		user_token = "<User Token>"
+		user_secret = "<User Secret>"
+
+		[store]
+		destination = "<Backup destination folder>"
+
+	All values can be overridden by environment variables, that have the following names:
+
+		SMGMG_BK_USERNAME = "<SmugMug username>"
+		SMGMG_BK_API_KEY = "<API Key>"
+		SMGMG_BK_API_SECRET = "<API Secret>"
+		SMGMG_BK_USER_TOKEN = "<User Token>"
+		SMGMG_BK_USER_SECRET = "<User Secret>"
+		SMGMG_BK_DESTINATION = "<Backup destination folder>"
+
+	All configuration values are required. They can be omitted in the configuration file
+	as long as they are overridden by environment values.
 */
 package smugmug
