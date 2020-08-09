@@ -4,6 +4,7 @@ before:
   hooks:
 builds:
   -
+    main: ./cmd/smugmug-backup/main.go
     goos:
       - linux
       - darwin
