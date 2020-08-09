@@ -12,12 +12,12 @@ import (
 
 // Conf is the configuration of the smugmug worker
 type Conf struct {
-	Username    string
-	ApiKey      string
-	ApiSecret   string
-	UserToken   string
-	UserSecret  string
-	Destination string
+	Username    string // SmugMug account username to backup
+	ApiKey      string // API key
+	ApiSecret   string // API secret
+	UserToken   string // User token
+	UserSecret  string // User secret
+	Destination string // Backup destination folder
 	// FileNames string // Template for files naming
 }
 
@@ -82,16 +82,9 @@ func (cfg *Conf) validate() error {
 	return nil
 }
 
-// Worker actually implements the backup logic
-type Worker struct {
-	req        requestsHandler
-	cfg        *Conf
-	downloadFn func(string, string, int64) error // defined in struct for better testing
-}
-
-// ReadConf produces a configuration object for the Smugmug worker
-// It reads the configuration from the ./config.toml file or from
-// "$HOME/.smgmg/config.toml"
+// ReadConf produces a configuration object for the Smugmug worker.
+//
+// It reads the configuration from ./config.toml or "$HOME/.smgmg/config.toml"
 func ReadConf() (*Conf, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
@@ -120,6 +113,14 @@ func ReadConf() (*Conf, error) {
 	return cfg, nil
 }
 
+// Worker actually implements the backup logic
+type Worker struct {
+	req        requestsHandler
+	cfg        *Conf
+	errors     int
+	downloadFn func(string, string, int64) error // defined in struct for better testing
+}
+
 // New return a SmugMug backup configuration. It returns an error if it fails parsing
 // the command line arguments
 func New(cfg *Conf) (*Worker, error) {
@@ -135,7 +136,16 @@ func New(cfg *Conf) (*Worker, error) {
 	}, nil
 }
 
-// Run runs the backup of the whole account
+// Run performs the backup of the provided SmugMug account.
+//
+// The workflow is the following:
+//
+//   - Get user albums
+//   - Iterate over all albums and:
+//     - create folder
+//     - iterate over all images and videos
+//       - if existing and with the same size, then skip
+//       - if not, download
 func (w *Worker) Run() error {
 	// Get user albums
 	log.Infof("Getting albums for user %s...\n", w.cfg.Username)
@@ -146,18 +156,12 @@ func (w *Worker) Run() error {
 
 	log.Infof("Found %d albums\n", len(albums))
 
-	// Iterate over all albums and:
-	// - create folder
-	// - iterate over all images/videos
-	//    - if existing, skip
-	//    - if not, download
-	var errors int
 	for _, album := range albums {
 		folder := filepath.Join(w.cfg.Destination, album.URLPath)
 
 		if err := createFolder(folder); err != nil {
 			log.WithError(err).Errorf("cannot create the destination folder %s", folder)
-			errors++
+			w.errors++
 			continue
 		}
 
@@ -165,7 +169,7 @@ func (w *Worker) Run() error {
 		images, err := w.albumImages(album.Uris.AlbumImages.URI, album.URLPath)
 		if err != nil {
 			log.WithError(err).Errorf("Cannot get album images for %s", album.Uris.AlbumImages.URI)
-			errors++
+			w.errors++
 			continue
 		}
 		log.Debugf("Got album images for %s", album.Uris.AlbumImages.URI)
@@ -173,10 +177,10 @@ func (w *Worker) Run() error {
 		w.saveImages(images, folder)
 	}
 
-	if errors > 0 {
-		return fmt.Errorf("Completed with %d errors, check logs", errors)
+	if w.errors > 0 {
+		return fmt.Errorf("Completed with %d errors, please check logs", w.errors)
 	}
 
-	log.Info("Backup completed")
+	log.Info("Backup completed.")
 	return nil
 }
