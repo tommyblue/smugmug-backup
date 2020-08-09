@@ -9,14 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add configuration file
-- Add tests
-- Add package docs: https://pkg.go.dev/github.com/tommyblue/smugmug-backup?tab=doc
+- 
 
 ### Changed
 
-- *BREAKING CHANGE* Rename environment variables
-- Move `main` package to `./cmd/smugmug-backup`
 - 
 
 ### Removed
@@ -25,7 +21,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
-- Update Dockerfile to go 1.14.7
+- 
+
+## [v0.0.4](https://github.com/tommyblue/smugmug-backup/tree/v0.0.4) - 2020-08-09
+
+### Added
+
+- Add configuration file support
+- Add tests
+- Add package docs: https://pkg.go.dev/github.com/tommyblue/smugmug-backup?tab=doc
+- `-version` flag prints build version
+
+### Changed
+
+- **[BREAKING CHANGE]** Rename environment variables
+- Move `main` package to `./cmd/smugmug-backup`
+
+### Maintenance
+
+- Update go version to 1.14.7
 - General refactoring of the code to make it more testable
 - Improve documentation
 

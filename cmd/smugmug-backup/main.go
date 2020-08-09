@@ -1,11 +1,17 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tommyblue/smugmug-backup"
 )
+
+// Use `-ldflags "-X main.version=someversion"` when building baker to set this value
+var version = "-- unknown --"
+var flagVersion = flag.Bool("version", false, "print version number")
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
@@ -21,6 +27,12 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
+	if *flagVersion {
+		fmt.Printf("Version: %s\n", version)
+		return
+	}
+
 	cfg, err := smugmug.ReadConf()
 	if err != nil {
 		log.WithError(err).Fatal("Configuration error")
