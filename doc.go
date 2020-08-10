@@ -47,7 +47,7 @@
 
 		[store]
 		destination = "<Backup destination folder>"
-		file_names = "{{.FileName}}
+		file_names = "{{.FileName}}"
 
 	All values can be overridden by environment variables, that have the following names:
 
