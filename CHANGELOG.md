@@ -23,6 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 
 
+## [v1.0.1](https://github.com/tommyblue/smugmug-backup/tree/v1.0.1) - 2020-08-10
+
+### Maintenance
+
+- This is an empty release used to create a version > v1.0.0 because an old temporary v1.0.0
+  (that was removed) is the last one seen by listings that already pulled it before removal.
+  That was my mistake but there's no way at the moment to retreat an already published version
+  so this is the only solution (until go 1.16 that will introduce a way to retreat versions)
+
 ## [v0.0.4](https://github.com/tommyblue/smugmug-backup/tree/v0.0.4) - 2020-08-09
 
 ### Added
