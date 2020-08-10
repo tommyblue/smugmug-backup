@@ -3,6 +3,7 @@ package smugmug
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"os"
 	"path/filepath"
 
@@ -18,7 +19,7 @@ type Conf struct {
 	UserToken   string // User token
 	UserSecret  string // User secret
 	Destination string // Backup destination folder
-	// FileNames string // Template for files naming
+	Filenames   string // Template for files naming
 }
 
 // overrideEnvConf overrides any configuration value if the
@@ -26,10 +27,6 @@ type Conf struct {
 func (cfg *Conf) overrideEnvConf() {
 	if os.Getenv("SMGMG_BK_USERNAME") != "" {
 		cfg.Username = os.Getenv("SMGMG_BK_USERNAME")
-	}
-
-	if os.Getenv("SMGMG_BK_DESTINATION") != "" {
-		cfg.Destination = os.Getenv("SMGMG_BK_DESTINATION")
 	}
 
 	if os.Getenv("SMGMG_BK_API_KEY") != "" {
@@ -47,15 +44,19 @@ func (cfg *Conf) overrideEnvConf() {
 	if os.Getenv("SMGMG_BK_USER_SECRET") != "" {
 		cfg.UserSecret = os.Getenv("SMGMG_BK_USER_SECRET")
 	}
+
+	if os.Getenv("SMGMG_BK_DESTINATION") != "" {
+		cfg.Destination = os.Getenv("SMGMG_BK_DESTINATION")
+	}
+
+	if os.Getenv("SMGMG_BK_FILE_NAMES") != "" {
+		cfg.Filenames = os.Getenv("SMGMG_BK_FILE_NAMES")
+	}
 }
 
 func (cfg *Conf) validate() error {
 	if cfg.Username == "" {
 		return errors.New("Username can't be empty")
-	}
-
-	if cfg.Destination == "" {
-		return errors.New("Destination can't be empty")
 	}
 
 	if cfg.ApiKey == "" {
@@ -72,6 +73,10 @@ func (cfg *Conf) validate() error {
 
 	if cfg.UserSecret == "" {
 		return errors.New("UserSecret can't be empty")
+	}
+
+	if cfg.Destination == "" {
+		return errors.New("Destination can't be empty")
 	}
 
 	// Check exising and writeability of destination folder
@@ -91,6 +96,9 @@ func ReadConf() (*Conf, error) {
 	viper.AddConfigPath("$HOME/.smgmg")
 	viper.AddConfigPath(".")
 
+	// defaults
+	viper.SetDefault("store.file_names", "{{.FileName}}")
+
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			return nil, errors.New("Configuration file not found in ./config.toml or $HOME/.smgmg/config.toml")
@@ -106,6 +114,7 @@ func ReadConf() (*Conf, error) {
 		UserToken:   viper.GetString("authentication.user_token"),
 		UserSecret:  viper.GetString("authentication.user_secret"),
 		Destination: viper.GetString("store.destination"),
+		Filenames:   viper.GetString("store.file_names"),
 	}
 
 	cfg.overrideEnvConf()
@@ -115,10 +124,11 @@ func ReadConf() (*Conf, error) {
 
 // Worker actually implements the backup logic
 type Worker struct {
-	req        requestsHandler
-	cfg        *Conf
-	errors     int
-	downloadFn func(string, string, int64) error // defined in struct for better testing
+	req          requestsHandler
+	cfg          *Conf
+	errors       int
+	downloadFn   func(string, string, int64) error // defined in struct for better testing
+	filenameTmpl *template.Template
 }
 
 // New return a SmugMug backup configuration. It returns an error if it fails parsing
@@ -129,11 +139,30 @@ func New(cfg *Conf) (*Worker, error) {
 	}
 
 	handler := newHTTPHandler(cfg.ApiKey, cfg.ApiSecret, cfg.UserToken, cfg.UserSecret)
+
+	tmpl, err := buildFilenameTemplate(cfg.Filenames)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Worker{
-		cfg:        cfg,
-		req:        handler,
-		downloadFn: handler.download,
+		cfg:          cfg,
+		req:          handler,
+		downloadFn:   handler.download,
+		filenameTmpl: tmpl,
 	}, nil
+}
+
+func buildFilenameTemplate(filenameTemplate string) (*template.Template, error) {
+	// Use FileName as default
+	if filenameTemplate == "" {
+		filenameTemplate = "{{.FileName}}"
+	}
+	tmpl, err := template.New("image_filename").Option("missingkey=error").Parse(filenameTemplate)
+	if err != nil {
+		return nil, err
+	}
+	return tmpl, nil
 }
 
 // Run performs the backup of the provided SmugMug account.

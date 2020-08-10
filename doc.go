@@ -47,6 +47,7 @@
 
 		[store]
 		destination = "<Backup destination folder>"
+		file_names = "{{.FileName}}
 
 	All values can be overridden by environment variables, that have the following names:
 
@@ -56,6 +57,7 @@
 		SMGMG_BK_USER_TOKEN = "<User Token>"
 		SMGMG_BK_USER_SECRET = "<User Secret>"
 		SMGMG_BK_DESTINATION = "<Backup destination folder>"
+		SMGMG_BK_FILE_NAMES = "<Backup destination folder>"
 
 	All configuration values are required. They can be omitted in the configuration file
 	as long as they are overridden by environment values.
