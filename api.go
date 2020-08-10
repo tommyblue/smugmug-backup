@@ -55,6 +55,9 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 		// Loop over response in inject the albumPath and then append to the images
 		for _, i := range a.Response.AlbumImage {
 			i.AlbumPath = albumPath
+			if err := i.buildFilename(w.filenameTmpl); err != nil {
+				return nil, fmt.Errorf("Cannot build image filename: %v", err)
+			}
 			images = append(images, i)
 		}
 		uri = a.Response.Pages.NextPage
@@ -90,14 +93,14 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 
 // saveVideo saves a video to the given folder unless its name is empty od is still under processing
 func (w *Worker) saveVideo(image albumImage, folder string) error {
-	if image.Processing { // Skip videos if under processing
-		return fmt.Errorf("Skipping video %s because under processing, %#v\n", image.Name(), image)
-	}
-
 	if image.Name() == "" {
 		return errors.New("Unable to find valid video filename, skipping..")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
+
+	if image.Processing { // Skip videos if under processing
+		return fmt.Errorf("Skipping video %s because under processing, %#v\n", image.Name(), image)
+	}
 
 	var v albumVideo
 	log.Debug("Getting ", image.Uris.LargestVideo.Uri)

@@ -34,6 +34,7 @@ user_secret = "<User Secret>"
 
 [store]
 destination = "<Backup destination folder>"
+file_names = "<Filename with template replacements>"
 ```
 
 All values can be overridden by environment variables, that have the following names:
@@ -45,19 +46,25 @@ SMGMG_BK_API_SECRET = "<API Secret>"
 SMGMG_BK_USER_TOKEN = "<User Token>"
 SMGMG_BK_USER_SECRET = "<User Secret>"
 SMGMG_BK_DESTINATION = "<Backup destination folder>"
+SMGMG_BK_FILE_NAMES = "<Filename with template replacements>"
 ```
 
 All configuration values are required. They can be omitted in the configuration file
 as long as they are overridden by environment values.
 
-The *username* can be found in the first part of the url in your SmugMug's homepage.  
+The **username** can be found in the first part of the url in your SmugMug's homepage.  
 In my case the url is [https://tommyblue.smugmug.com/](https://tommyblue.smugmug.com/) and the
 username is `tommyblue`.
 
-The *destination* is the local path to save SmugMug pictures and videos.  
+The **destination** is the local path to save SmugMug pictures and videos.  
 If the folder is not empty, then only new or changed files will be downloaded.
 
-*api_key*, *api_secret*, *user_token* and *user_secret* are the required credentials for
+**file_names** is a string including template replacements that will be used to build the file
+names for the files on disk. Accepted keys are `FileName`, `ImageKey`, `ArchivedMD5` and `UploadKey`
+and their values comes from the AlbumImage API response. If an invalid replacement is used,
+an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.  
+
+**api_key**, **api_secret**, **user_token** and **user_secret** are the required credentials for
 authenticating with the SmugMug API.  
 See [credentials](#credentials) below for details about how to obtain them.
 

@@ -75,6 +75,7 @@ func TestRun(t *testing.T) {
 	defer os.RemoveAll(dest_dir)
 
 	var downloadCalled int
+	tmpl, _ := buildFilenameTemplate("")
 	w := &Worker{
 		cfg: &Conf{
 			Username:    testUsername,
@@ -90,6 +91,7 @@ func TestRun(t *testing.T) {
 			downloadCalled++
 			return nil
 		},
+		filenameTmpl: tmpl,
 	}
 	w.Run()
 

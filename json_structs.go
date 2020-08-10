@@ -1,5 +1,11 @@
 package smugmug
 
+import (
+	"bytes"
+	"errors"
+	"html/template"
+)
+
 type user struct {
 	Response struct {
 		User struct {
@@ -45,23 +51,51 @@ type albumImage struct {
 	AlbumPath    string // From album.URLPath
 	FileName     string `json:"FileName"`
 	ImageKey     string `json:"ImageKey"` // Use as unique ID if FileName is empty
+	ArchivedMD5  string `json:"ArchivedMD5"`
 	ArchivedSize int64  `json:"ArchivedSize"`
 	ArchivedUri  string `json:"ArchivedUri"`
 	IsVideo      bool   `json:"IsVideo"`
 	Processing   bool   `json:"Processing"`
+	UploadKey    string `json:"UploadKey"`
 	Uris         struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`
 		} `json:"LargestVideo"`
 	} `json:"Uris"`
+
+	builtFilename string // The final filename, after template replacements
+}
+
+func (a *albumImage) buildFilename(tmpl *template.Template) error {
+	replacementVars := map[string]string{
+		"FileName":    a.FileName,
+		"ImageKey":    a.ImageKey,
+		"ArchivedMD5": a.ArchivedMD5,
+		"UploadKey":   a.UploadKey,
+	}
+
+	var builtFilename bytes.Buffer
+	if err := tmpl.Execute(&builtFilename, replacementVars); err != nil {
+		return err
+	}
+
+	a.builtFilename = builtFilename.String()
+	if a.builtFilename == "" {
+		return errors.New("Empty resulting name")
+	}
+	return nil
 }
 
 func (a *albumImage) Name() string {
-	name := a.FileName
-	if name == "" {
-		name = a.ImageKey
+	if a.builtFilename != "" {
+		return a.builtFilename
 	}
-	return name
+
+	if a.FileName != "" {
+		return a.FileName
+	}
+
+	return a.ImageKey
 }
 
 type albumVideo struct {

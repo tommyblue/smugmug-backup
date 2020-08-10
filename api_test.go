@@ -47,8 +47,8 @@ func (c *albumImages) get(url string, obj interface{}) error {
 	defer func() { c.called++ }()
 	a := obj.(*albumImagesResponse)
 	a.Response.AlbumImage = []albumImage{
-		{},
-		{},
+		{FileName: "value"},
+		{FileName: "value"},
 	}
 	if c.called == 0 {
 		a.Response.Pages.NextPage = "something"
@@ -59,8 +59,10 @@ func (c *albumImages) get(url string, obj interface{}) error {
 }
 
 func TestGetAlbumImages(t *testing.T) {
+	tmpl, _ := buildFilenameTemplate("")
 	w := &Worker{
-		req: &albumImages{},
+		req:          &albumImages{},
+		filenameTmpl: tmpl,
 	}
 	albums, err := w.albumImages("someurl", "myAlbumPath")
 	if err != nil {
