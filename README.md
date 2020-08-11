@@ -1,6 +1,6 @@
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/tommyblue/smugmug-backup)](https://pkg.go.dev/github.com/tommyblue/smugmug-backup)
-
 # SmugMug backup
+
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/tommyblue/smugmug-backup)](https://pkg.go.dev/github.com/tommyblue/smugmug-backup)
 
 ![Go](https://github.com/tommyblue/smugmug-backup/workflows/Go/badge.svg)
 
