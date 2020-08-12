@@ -14,7 +14,7 @@ You can run the app multiple times, all exising files will be skipped if their s
 
 ## Releases
 
-Releases for multiple systems can be found in the
+Releases for multiple systems (including ARM) can be found in the
 [project releases page](https://github.com/tommyblue/smugmug-backup/releases)
 
 ## Configuration

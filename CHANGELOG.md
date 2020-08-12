@@ -21,6 +21,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
+- 
+
+## [v1.1.1](https://github.com/tommyblue/smugmug-backup/tree/v1.1.1) - 2020-08-12
+
+### Added
+
+- Build releases for ARM and ARM64
+
+### Maintenance
+
 - Upgrade to Go 1.15
 
 ## [v1.1.0](https://github.com/tommyblue/smugmug-backup/tree/v1.1.0) - 2020-08-11
