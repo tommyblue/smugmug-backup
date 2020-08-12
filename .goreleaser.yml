@@ -9,6 +9,12 @@ builds:
       - linux
       - darwin
       - windows
+    goarch:
+      - amd64
+      - 386
+    ignore:
+      - goos: darwin
+        goarch: 386
     env:
       - CGO_ENABLED=0
       - GOFLAGS=-mod=vendor
