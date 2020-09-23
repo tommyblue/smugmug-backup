@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
-- 
+- Upgrade to Go 1.15.2
 
 ## [v1.1.1](https://github.com/tommyblue/smugmug-backup/tree/v1.1.1) - 2020-08-12
 
