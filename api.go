@@ -17,11 +17,20 @@ func (w *Worker) userAlbums() ([]album, error) {
 	return w.albums(uri)
 }
 
+// currentUser returns the nickname of the authenticated user
+func (w *Worker) currentUser() (string, error) {
+	var u currentUser
+	if err := w.req.get("/api/v2!authuser", &u); err != nil {
+		return "", err
+	}
+	return u.Response.User.NickName, nil
+}
+
 // userAlbumsURI returns the URI of the first page of the user albums. It's intended to be used
 // as argument for a call to albums()
 func (w *Worker) userAlbumsURI() string {
 	var u user
-	path := fmt.Sprintf("/api/v2/user/%s", w.cfg.Username)
+	path := fmt.Sprintf("/api/v2/user/%s", w.cfg.username)
 	w.req.get(path, &u)
 	return u.Response.User.Uris.UserAlbums.URI
 }

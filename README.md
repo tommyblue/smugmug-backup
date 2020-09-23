@@ -26,7 +26,6 @@ The configuration file must have this structure:
 
 ```toml
 [authentication]
-username = "<SmugMug username>"
 api_key = "<API Key>"
 api_secret = "<API Secret>"
 user_token = "<User Token>"
@@ -40,7 +39,6 @@ file_names = "<Filename with template replacements>"
 All values can be overridden by environment variables, that have the following names:
 
 ```sh
-SMGMG_BK_USERNAME = "<SmugMug username>"
 SMGMG_BK_API_KEY = "<API Key>"
 SMGMG_BK_API_SECRET = "<API Secret>"
 SMGMG_BK_USER_TOKEN = "<User Token>"
@@ -51,10 +49,6 @@ SMGMG_BK_FILE_NAMES = "<Filename with template replacements>"
 
 All configuration values are required. They can be omitted in the configuration file
 as long as they are overridden by environment values.
-
-The **username** can be found in the first part of the url in your SmugMug's homepage.  
-In my case the url is [https://tommyblue.smugmug.com/](https://tommyblue.smugmug.com/) and the
-username is `tommyblue`.
 
 The **destination** is the local path to save SmugMug pictures and videos.  
 If the folder is not empty, then only new or changed files will be downloaded.

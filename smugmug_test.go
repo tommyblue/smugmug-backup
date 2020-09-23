@@ -26,12 +26,16 @@ type mockHandler struct {
 
 func (m *mockHandler) get(url string, obj interface{}) error {
 	switch url {
+	case "/api/v2!authuser":
+		var u *currentUser
+		u = obj.(*currentUser)
+		u.Response.User.NickName = m.username
+		return nil
 	// from w.userAlbumsURI()
 	case fmt.Sprintf("/api/v2/user/%s", testUsername):
 		var u *user
 		u = obj.(*user)
 		u.Response.User.Uris.UserAlbums.URI = m.userAlbumsURI
-		// log.Infof("DBG: %s", obj.(*user).Response.User.Uris.UserAlbums.URI)
 		obj = u
 		return nil
 	// from w.albums()
@@ -68,17 +72,12 @@ func (m *mockHandler) get(url string, obj interface{}) error {
 func TestRun(t *testing.T) {
 	defer testutil.LessLogging()()
 
-	dest_dir, err := ioutil.TempDir("/tmp", "smugmug-backup")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dest_dir)
+	dest_dir := t.TempDir()
 
 	var downloadCalled int
 	tmpl, _ := buildFilenameTemplate("")
 	w := &Worker{
 		cfg: &Conf{
-			Username:    testUsername,
 			Destination: dest_dir,
 		},
 		req: &mockHandler{
@@ -122,32 +121,27 @@ func setupConfFile(t *testing.T, cfg *testConf, missingSecrets bool) func() {
 	if !missingSecrets {
 		cfgFile = []byte(fmt.Sprintf(`
 [authentication]
-username = "%s"
 api_key = "%s"
 api_secret = "%s"
 user_token = "%s"
 user_secret = "%s"
 [store]
 destination = "%s"
-`, cfg.username, cfg.apiKey, cfg.apiSecret, cfg.userToken, cfg.userSecret, cfg.destination))
+`, cfg.apiKey, cfg.apiSecret, cfg.userToken, cfg.userSecret, cfg.destination))
 	} else {
 		cfgFile = []byte(fmt.Sprintf(`
 [authentication]
-username = "%s"
 api_key = "%s"
 user_token = "%s"
 [store]
 destination = "%s"
-`, cfg.username, cfg.apiKey, cfg.userToken, cfg.destination))
+`, cfg.apiKey, cfg.userToken, cfg.destination))
 	}
 
-	dir, err := ioutil.TempDir("/tmp", "smgmg")
-	if err != nil {
-		t.Fatalf("Can't create temp dir for testing")
-	}
+	dir := t.TempDir()
 
 	file := filepath.Join(dir, "config.toml")
-	err = ioutil.WriteFile(file, cfgFile, 0644)
+	err := ioutil.WriteFile(file, cfgFile, 0644)
 	if err != nil {
 		t.Fatalf("Can't create config file for testing")
 	}
@@ -168,7 +162,6 @@ destination = "%s"
 func TestReadConf(t *testing.T) {
 	viper.Reset()
 	cfgObj := &testConf{
-		username:    "test_user",
 		destination: "test_dest",
 		apiKey:      "test_apikey",
 		apiSecret:   "test_apisecret",
@@ -181,10 +174,6 @@ func TestReadConf(t *testing.T) {
 	cfg, err := ReadConf()
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
-	}
-
-	if cfgObj.username != cfg.Username {
-		t.Fatalf("username: want: %s, got: %s", cfgObj.username, cfg.Username)
 	}
 
 	if cfgObj.destination != cfg.Destination {
@@ -211,7 +200,6 @@ func TestReadConf(t *testing.T) {
 func TestReadConfOverrides(t *testing.T) {
 	viper.Reset()
 	cfgObj := &testConf{
-		username:    "test_user",
 		destination: "test_dest",
 		apiKey:      "test_apikey",
 		apiSecret:   "test_apisecret",
@@ -221,7 +209,6 @@ func TestReadConfOverrides(t *testing.T) {
 
 	defer setupConfFile(t, cfgObj, false)()
 
-	os.Setenv("SMGMG_BK_USERNAME", "overridden_username")
 	os.Setenv("SMGMG_BK_DESTINATION", "overridden_dest")
 	os.Setenv("SMGMG_BK_API_KEY", "overridden_apikey")
 	os.Setenv("SMGMG_BK_API_SECRET", "overridden_apisecret")
@@ -229,7 +216,6 @@ func TestReadConfOverrides(t *testing.T) {
 	os.Setenv("SMGMG_BK_USER_SECRET", "overridden_usersecret")
 
 	defer func() {
-		os.Unsetenv("SMGMG_BK_USERNAME")
 		os.Unsetenv("SMGMG_BK_DESTINATION")
 		os.Unsetenv("SMGMG_BK_API_KEY")
 		os.Unsetenv("SMGMG_BK_API_SECRET")
@@ -239,10 +225,6 @@ func TestReadConfOverrides(t *testing.T) {
 	cfg, err := ReadConf()
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
-	}
-
-	if "overridden_username" != cfg.Username {
-		t.Fatalf("username: want: %s, got: %s", "overridden_username", cfg.Username)
 	}
 
 	if "overridden_dest" != cfg.Destination {
@@ -268,12 +250,8 @@ func TestReadConfOverrides(t *testing.T) {
 
 func TestReadConfMissingFileValues(t *testing.T) {
 	viper.Reset()
-	dest_dir, err := ioutil.TempDir("/tmp", "smgmg")
-	if err != nil {
-		t.Fatalf("Can't create temp dir for testing")
-	}
+	dest_dir := t.TempDir()
 	cfgObj := &testConf{
-		username:    "test_user",
 		destination: dest_dir,
 		apiKey:      "test_apikey",
 		apiSecret:   "test_apisecret",
@@ -307,10 +285,6 @@ func TestReadConfMissingFileValues(t *testing.T) {
 	}
 	if _, err := New(cfg); err != nil {
 		t.Fatalf("unexpected err: %v", err)
-	}
-
-	if cfgObj.username != cfg.Username {
-		t.Fatalf("username: want: %s, got: %s", cfgObj.username, cfg.Username)
 	}
 
 	if cfgObj.destination != cfg.Destination {

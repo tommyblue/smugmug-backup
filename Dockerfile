@@ -18,9 +18,9 @@ RUN sed -e "/deb-src/d" -i /etc/apt/sources.list \
     && rm -rf /.root/cache \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://dl.google.com/go/go1.15.linux-amd64.tar.gz ./go.tar.gz
+ADD https://dl.google.com/go/go1.15.2.linux-amd64.tar.gz ./go.tar.gz
 
-RUN echo "2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602 go.tar.gz" | sha256sum -c - && \
+RUN echo "b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552 go.tar.gz" | sha256sum -c - && \
     tar -C /usr/local -xzf go.tar.gz && \
     rm ./go.tar.gz
 

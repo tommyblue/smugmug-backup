@@ -17,11 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- 
+- [DEPRECATION] `authentication.username` configuration is now ignored. The username is retrieved automatically from the API
 
 ### Maintenance
 
-- 
+- Upgrade to Go 1.15.2
 
 ## [v1.1.1](https://github.com/tommyblue/smugmug-backup/tree/v1.1.1) - 2020-08-12
 

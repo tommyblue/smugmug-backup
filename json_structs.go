@@ -6,6 +6,14 @@ import (
 	"html/template"
 )
 
+type currentUser struct {
+	Response struct {
+		User struct {
+			NickName string `json:"NickName"`
+		}
+	}
+}
+
 type user struct {
 	Response struct {
 		User struct {
