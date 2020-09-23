@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- 
+
+### Changed
+
+- 
+
+### Removed
+
+- 
+
+### Maintenance
+
+- 
+
+## [v1.2.0](https://github.com/tommyblue/smugmug-backup/tree/v1.2.0) - 2020-09-24
+
+### Added
+
 - Add `store.use_metadata_times` and `store.force_metadata_times` confs to set files chtimes
 
 ### Changed
