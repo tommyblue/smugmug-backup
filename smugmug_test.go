@@ -86,9 +86,9 @@ func TestRun(t *testing.T) {
 			albumURLPath:   albumURLPath,
 			albumImagesURI: albumImagesURI,
 		},
-		downloadFn: func(_, _ string, _ int64) error {
+		downloadFn: func(_, _ string, _ int64) (bool, error) {
 			downloadCalled++
-			return nil
+			return true, nil
 		},
 		filenameTmpl: tmpl,
 	}

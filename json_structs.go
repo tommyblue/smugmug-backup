@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"html/template"
+	"time"
 )
 
 type currentUser struct {
@@ -55,22 +56,34 @@ type albumImagesResponse struct {
 	} `json:"Response"`
 }
 
+type imageMetadataResponse struct {
+	Response struct {
+		DateTimeCreated  time.Time `json:"DateTimeCreated"`
+		DateTimeModified time.Time `json:"DateTimeModified"`
+	} `json:"Response"`
+}
+
 type albumImage struct {
-	AlbumPath    string // From album.URLPath
-	FileName     string `json:"FileName"`
-	ImageKey     string `json:"ImageKey"` // Use as unique ID if FileName is empty
-	ArchivedMD5  string `json:"ArchivedMD5"`
-	ArchivedSize int64  `json:"ArchivedSize"`
-	ArchivedUri  string `json:"ArchivedUri"`
-	IsVideo      bool   `json:"IsVideo"`
-	Processing   bool   `json:"Processing"`
-	UploadKey    string `json:"UploadKey"`
-	Uris         struct {
+	AlbumPath        string    // From album.URLPath
+	FileName         string    `json:"FileName"`
+	ImageKey         string    `json:"ImageKey"` // Use as unique ID if FileName is empty
+	ArchivedMD5      string    `json:"ArchivedMD5"`
+	ArchivedSize     int64     `json:"ArchivedSize"`
+	ArchivedUri      string    `json:"ArchivedUri"`
+	IsVideo          bool      `json:"IsVideo"`
+	Processing       bool      `json:"Processing"`
+	UploadKey        string    `json:"UploadKey"`
+	DateTimeOriginal time.Time `json:"DateTimeOriginal"`
+	Uris             struct {
+		ImageMetadata struct {
+			Uri string `json:"Uri"`
+		} `json:"ImageMetadata"`
 		LargestVideo struct {
 			Uri string `json:"Uri"`
 		} `json:"LargestVideo"`
 	} `json:"Uris"`
 
+	fileDatetime  time.Time
 	builtFilename string // The final filename, after template replacements
 }
 

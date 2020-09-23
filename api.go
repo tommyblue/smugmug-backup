@@ -3,6 +3,8 @@ package smugmug
 import (
 	"errors"
 	"fmt"
+	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -75,6 +77,14 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 	return images, nil
 }
 
+func (w *Worker) imageTimestamp(img albumImage) time.Time {
+	var i imageMetadataResponse
+	if err := w.req.get(img.Uris.ImageMetadata.Uri, &i); err != nil {
+		return time.Time{}
+	}
+	return i.Response.DateTimeCreated
+}
+
 // saveImages calls saveImage or saveVideo to save a list of album images to the given folder
 func (w *Worker) saveImages(images []albumImage, folder string) {
 	for _, image := range images {
@@ -97,7 +107,17 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 	log.Debug(image.ArchivedUri)
-	return w.downloadFn(dest, image.ArchivedUri, image.ArchivedSize)
+
+	ok, err := w.downloadFn(dest, image.ArchivedUri, image.ArchivedSize)
+	if err != nil {
+		return err
+	}
+
+	if w.cfg.UseMetadataTimes && (ok || w.cfg.ForceMetadataTimes) {
+		return w.setChTime(image, dest)
+	}
+
+	return nil
 }
 
 // saveVideo saves a video to the given folder unless its name is empty od is still under processing
@@ -112,10 +132,33 @@ func (w *Worker) saveVideo(image albumImage, folder string) error {
 	}
 
 	var v albumVideo
-	log.Debug("Getting ", image.Uris.LargestVideo.Uri)
+	log.Debug("(saveVideo) getting ", image.Uris.LargestVideo.Uri)
 	if err := w.req.get(image.Uris.LargestVideo.Uri, &v); err != nil {
 		return fmt.Errorf("Cannot get URI for video %+v. Error: %v", image, err)
 	}
 
-	return w.downloadFn(dest, v.Response.LargestVideo.Url, v.Response.LargestVideo.Size)
+	ok, err := w.downloadFn(dest, v.Response.LargestVideo.Url, v.Response.LargestVideo.Size)
+	if err != nil {
+		return err
+	}
+
+	if w.cfg.UseMetadataTimes && (ok || w.cfg.ForceMetadataTimes) {
+		return w.setChTime(image, dest)
+	}
+
+	return nil
+}
+
+func (w *Worker) setChTime(image albumImage, dest string) error {
+	// Try first with the date in the image, to avoid making an additional call
+	created := image.DateTimeOriginal
+	if created.IsZero() {
+		created = w.imageTimestamp(image)
+	}
+	if !created.IsZero() {
+		log.Debugf("Setting chtime %v for %s", created, dest)
+		return os.Chtimes(dest, time.Now(), created)
+	}
+
+	return nil
 }

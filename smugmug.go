@@ -13,12 +13,14 @@ import (
 
 // Conf is the configuration of the smugmug worker
 type Conf struct {
-	ApiKey      string // API key
-	ApiSecret   string // API secret
-	UserToken   string // User token
-	UserSecret  string // User secret
-	Destination string // Backup destination folder
-	Filenames   string // Template for files naming
+	ApiKey             string // API key
+	ApiSecret          string // API secret
+	UserToken          string // User token
+	UserSecret         string // User secret
+	Destination        string // Backup destination folder
+	Filenames          string // Template for files naming
+	UseMetadataTimes   bool   // When true, the last update timestamp will be retrieved from metadata
+	ForceMetadataTimes bool   // When true, then the last update timestamp is always retrieved and overwritten, also for existing files
 
 	username string
 }
@@ -105,15 +107,21 @@ func ReadConf() (*Conf, error) {
 	}
 
 	cfg := &Conf{
-		ApiKey:      viper.GetString("authentication.api_key"),
-		ApiSecret:   viper.GetString("authentication.api_secret"),
-		UserToken:   viper.GetString("authentication.user_token"),
-		UserSecret:  viper.GetString("authentication.user_secret"),
-		Destination: viper.GetString("store.destination"),
-		Filenames:   viper.GetString("store.file_names"),
+		ApiKey:             viper.GetString("authentication.api_key"),
+		ApiSecret:          viper.GetString("authentication.api_secret"),
+		UserToken:          viper.GetString("authentication.user_token"),
+		UserSecret:         viper.GetString("authentication.user_secret"),
+		Destination:        viper.GetString("store.destination"),
+		Filenames:          viper.GetString("store.file_names"),
+		UseMetadataTimes:   viper.GetBool("store.use_metadata_times"),
+		ForceMetadataTimes: viper.GetBool("store.force_metadata_times"),
 	}
 
 	cfg.overrideEnvConf()
+
+	if !cfg.UseMetadataTimes && cfg.ForceMetadataTimes {
+		return nil, errors.New("Cannot use store.force_metadata_times without store.use_metadata_times")
+	}
 
 	return cfg, nil
 }
@@ -123,7 +131,7 @@ type Worker struct {
 	req          requestsHandler
 	cfg          *Conf
 	errors       int
-	downloadFn   func(string, string, int64) error // defined in struct for better testing
+	downloadFn   func(string, string, int64) (bool, error) // defined in struct for better testing
 	filenameTmpl *template.Template
 }
 
@@ -203,6 +211,7 @@ func (w *Worker) Run() error {
 			w.errors++
 			continue
 		}
+
 		log.Debugf("Got album images for %s", album.Uris.AlbumImages.URI)
 		log.Debugf("%+v", images)
 		w.saveImages(images, folder)
