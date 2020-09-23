@@ -34,9 +34,11 @@ user_secret = "<User Secret>"
 [store]
 destination = "<Backup destination folder>"
 file_names = "<Filename with template replacements>"
+use_metadata_times = true
+force_metadata_times = true
 ```
 
-All values can be overridden by environment variables, that have the following names:
+Some values can be overridden by environment variables, that have the following names:
 
 ```sh
 SMGMG_BK_API_KEY = "<API Key>"
@@ -57,6 +59,11 @@ If the folder is not empty, then only new or changed files will be downloaded.
 names for the files on disk. Accepted keys are `FileName`, `ImageKey`, `ArchivedMD5` and `UploadKey`
 and their values comes from the AlbumImage API response. If an invalid replacement is used,
 an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.  
+
+When **use_metadata_times** is true, then the last modification timestamp of the objects will
+be set based on SmugMug metadata for newly downloaded files. Note that this option can require
+an additional API call for each image/video. If also **force_metadata_times** is true, then the
+timestamp is applied to all existing files.
 
 **api_key**, **api_secret**, **user_token** and **user_secret** are the required credentials for
 authenticating with the SmugMug API.  

@@ -40,37 +40,37 @@ func (s *handler) get(url string, obj interface{}) error {
 }
 
 // download the resource (image or video) from the given url to the given destination, checking
-// if a file with the same size exists (and skipping the download in that case)
-func (s *handler) download(dest, downloadURL string, fileSize int64) error {
+// if a file with the same size exists (and skipping the download in that case, returning false)
+func (s *handler) download(dest, downloadURL string, fileSize int64) (bool, error) {
 	if _, err := os.Stat(dest); err == nil {
 		if sameFileSizes(dest, fileSize) {
 			log.Debug("File exists with same size:", downloadURL)
-			return nil
+			return false, nil
 		}
 	}
 	log.Info("Getting ", downloadURL)
 
 	response, err := s.makeAPICall(downloadURL)
 	if err != nil {
-		return fmt.Errorf("%s: download failed with: %s", downloadURL, err)
+		return false, fmt.Errorf("%s: download failed with: %s", downloadURL, err)
 	}
 	defer response.Body.Close()
 
 	// Create empty destination file
 	file, err := os.Create(dest)
 	if err != nil {
-		return fmt.Errorf("%s: file creation failed with: %s", dest, err)
+		return false, fmt.Errorf("%s: file creation failed with: %s", dest, err)
 	}
 	defer file.Close()
 
 	// Copy the content to the file
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		return fmt.Errorf("%s: file content copy failed with: %s", dest, err)
+		return false, fmt.Errorf("%s: file content copy failed with: %s", dest, err)
 	}
 
 	log.Info("Saved ", dest)
-	return nil
+	return true, nil
 }
 
 // getJSON makes a http calls to the given url, trying to decode the JSON response on the given obj

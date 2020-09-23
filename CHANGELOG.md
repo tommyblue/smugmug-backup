@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 
+- Add `store.use_metadata_times` and `store.force_metadata_times` confs to set files chtimes
 
 ### Changed
 
