@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- 
+- [DEPRECATION] `authentication.username` configuration is now ignored. The username is retrieved automatically from the API
 
 ### Maintenance
 

@@ -13,22 +13,19 @@ import (
 
 // Conf is the configuration of the smugmug worker
 type Conf struct {
-	Username    string // SmugMug account username to backup
 	ApiKey      string // API key
 	ApiSecret   string // API secret
 	UserToken   string // User token
 	UserSecret  string // User secret
 	Destination string // Backup destination folder
 	Filenames   string // Template for files naming
+
+	username string
 }
 
 // overrideEnvConf overrides any configuration value if the
 // corresponding environment variables is set
 func (cfg *Conf) overrideEnvConf() {
-	if os.Getenv("SMGMG_BK_USERNAME") != "" {
-		cfg.Username = os.Getenv("SMGMG_BK_USERNAME")
-	}
-
 	if os.Getenv("SMGMG_BK_API_KEY") != "" {
 		cfg.ApiKey = os.Getenv("SMGMG_BK_API_KEY")
 	}
@@ -55,10 +52,6 @@ func (cfg *Conf) overrideEnvConf() {
 }
 
 func (cfg *Conf) validate() error {
-	if cfg.Username == "" {
-		return errors.New("Username can't be empty")
-	}
-
 	if cfg.ApiKey == "" {
 		return errors.New("ApiKey can't be empty")
 	}
@@ -107,8 +100,11 @@ func ReadConf() (*Conf, error) {
 		}
 	}
 
+	if viper.GetString("authentication.username") != "" {
+		log.Warnf("[DEPRECATION] Username configuration value is ignored. It is now retrieved automatically from SmugMug based on the authentication credentials.")
+	}
+
 	cfg := &Conf{
-		Username:    viper.GetString("authentication.username"),
 		ApiKey:      viper.GetString("authentication.api_key"),
 		ApiSecret:   viper.GetString("authentication.api_secret"),
 		UserToken:   viper.GetString("authentication.user_token"),
@@ -176,8 +172,14 @@ func buildFilenameTemplate(filenameTemplate string) (*template.Template, error) 
 //       - if existing and with the same size, then skip
 //       - if not, download
 func (w *Worker) Run() error {
+	var err error
+	w.cfg.username, err = w.currentUser()
+	if err != nil {
+		return fmt.Errorf("Error checking credentials: %v", err)
+	}
+
 	// Get user albums
-	log.Infof("Getting albums for user %s...\n", w.cfg.Username)
+	log.Infof("Getting albums for user %s...\n", w.cfg.username)
 	albums, err := w.userAlbums()
 	if err != nil {
 		return fmt.Errorf("Error getting user albums: %v", err)
