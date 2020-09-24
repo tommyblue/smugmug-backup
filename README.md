@@ -1,8 +1,6 @@
 # SmugMug backup
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/tommyblue/smugmug-backup)](https://pkg.go.dev/github.com/tommyblue/smugmug-backup)
-
-![Go](https://github.com/tommyblue/smugmug-backup/workflows/Go/badge.svg)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/tommyblue/smugmug-backup)](https://pkg.go.dev/github.com/tommyblue/smugmug-backup) ![Go](https://github.com/tommyblue/smugmug-backup/workflows/Go/badge.svg)
 
 Makes a full backup of a [SmugMug](https://www.smugmug.com/) account (images and videos
 are supported).
@@ -11,6 +9,19 @@ The program loops over the images and videos of the user's albums and saves them
 folder, replicating the SmugMug paths.
 
 You can run the app multiple times, all exising files will be skipped if their sizes match.
+
+- [SmugMug backup](#smugmug-backup)
+  * [Releases](#releases)
+  * [Configuration](#configuration)
+  * [Run](#run)
+  * [Credentials](#credentials)
+    + [Obtain API keys](#obtain-api-keys)
+    + [Obtain Tokens](#obtain-tokens)
+      - [Alternative ways to obtain the tokens](#alternative-ways-to-obtain-the-tokens)
+  * [Build and install](#build-and-install)
+  * [Debug for errors](#debug-for-errors)
+  * [Credits](#credits)
+  * [Bugs and contributing](#bugs-and-contributing)
 
 ## Releases
 
