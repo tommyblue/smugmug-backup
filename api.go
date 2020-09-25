@@ -151,8 +151,8 @@ func (w *Worker) saveVideo(image albumImage, folder string) error {
 
 func (w *Worker) setChTime(image albumImage, dest string) error {
 	// Try first with the date in the image, to avoid making an additional call
-	created := image.DateTimeOriginal
-	if created.IsZero() {
+	created, err := time.Parse(time.RFC3339, image.DateTimeOriginal)
+	if err != nil || created.IsZero() {
 		created = w.imageTimestamp(image)
 	}
 	if !created.IsZero() {

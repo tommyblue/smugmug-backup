@@ -64,16 +64,16 @@ type imageMetadataResponse struct {
 }
 
 type albumImage struct {
-	AlbumPath        string    // From album.URLPath
-	FileName         string    `json:"FileName"`
-	ImageKey         string    `json:"ImageKey"` // Use as unique ID if FileName is empty
-	ArchivedMD5      string    `json:"ArchivedMD5"`
-	ArchivedSize     int64     `json:"ArchivedSize"`
-	ArchivedUri      string    `json:"ArchivedUri"`
-	IsVideo          bool      `json:"IsVideo"`
-	Processing       bool      `json:"Processing"`
-	UploadKey        string    `json:"UploadKey"`
-	DateTimeOriginal time.Time `json:"DateTimeOriginal"`
+	AlbumPath        string // From album.URLPath
+	FileName         string `json:"FileName"`
+	ImageKey         string `json:"ImageKey"` // Use as unique ID if FileName is empty
+	ArchivedMD5      string `json:"ArchivedMD5"`
+	ArchivedSize     int64  `json:"ArchivedSize"`
+	ArchivedUri      string `json:"ArchivedUri"`
+	IsVideo          bool   `json:"IsVideo"`
+	Processing       bool   `json:"Processing"`
+	UploadKey        string `json:"UploadKey"`
+	DateTimeOriginal string `json:"DateTimeOriginal"`
 	Uris             struct {
 		ImageMetadata struct {
 			Uri string `json:"Uri"`

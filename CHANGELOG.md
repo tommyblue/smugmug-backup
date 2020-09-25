@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 
 
+## [v1.2.1](https://github.com/tommyblue/smugmug-backup/tree/v1.2.1) - 2020-09-25
+
+### Maintenance
+
+- Change how the image DateTimeOriginal field is parsed to manage wrong dates
+
 ## [v1.2.0](https://github.com/tommyblue/smugmug-backup/tree/v1.2.0) - 2020-09-24
 
 ### Added
