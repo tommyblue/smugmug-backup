@@ -11,17 +11,17 @@ folder, replicating the SmugMug paths.
 You can run the app multiple times, all exising files will be skipped if their sizes match.
 
 - [SmugMug backup](#smugmug-backup)
-  * [Releases](#releases)
-  * [Configuration](#configuration)
-  * [Run](#run)
-  * [Credentials](#credentials)
-    + [Obtain API keys](#obtain-api-keys)
-    + [Obtain Tokens](#obtain-tokens)
+  - [Releases](#releases)
+  - [Configuration](#configuration)
+  - [Run](#run)
+  - [Credentials](#credentials)
+    - [Obtain API keys](#obtain-api-keys)
+    - [Obtain Tokens](#obtain-tokens)
       - [Alternative ways to obtain the tokens](#alternative-ways-to-obtain-the-tokens)
-  * [Build and install](#build-and-install)
-  * [Debug for errors](#debug-for-errors)
-  * [Credits](#credits)
-  * [Bugs and contributing](#bugs-and-contributing)
+  - [Build and install](#build-and-install)
+  - [Debug for errors](#debug-for-errors)
+  - [Credits](#credits)
+  - [Bugs and contributing](#bugs-and-contributing)
 
 ## Releases
 
@@ -72,9 +72,15 @@ and their values comes from the AlbumImage API response. If an invalid replaceme
 an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.  
 
 When **use_metadata_times** is true, then the last modification timestamp of the objects will
-be set based on SmugMug metadata for newly downloaded files. Note that this option can require
-an additional API call for each image/video. If also **force_metadata_times** is true, then the
-timestamp is applied to all existing files.
+be set based on SmugMug metadata for newly downloaded files. If also **force_metadata_times** is true, then the timestamp is applied to all existing files.
+
+> The **use_metadata_times** can be required if you notice that the images creation datetime is
+> wrong by ~7h. This is a bug in the SmugMug Uploader: "Our uploader process currently isn't
+> time zone aware and takes the DateTimeOriginal field without time zone information".
+> 
+> The solution is to use the Metadata API endpoint to retrieve the EXIF informations, but it
+> requires an additional API call for each image/video.  
+> In my case, a full backup that requires ~10 minutes, increases to 2+ hours with this option.
 
 **api_key**, **api_secret**, **user_token** and **user_secret** are the required credentials for
 authenticating with the SmugMug API.  
