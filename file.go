@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -26,7 +26,7 @@ func createFolder(path string) error {
 }
 
 func checkDestFolder(folderPath string) error {
-	if !path.IsAbs(folderPath) {
+	if !filepath.IsAbs(folderPath) {
 		return errors.New("Destination path must be an absolute path")
 	}
 
