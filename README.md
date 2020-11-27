@@ -66,6 +66,15 @@ as long as they are overridden by environment values.
 The **destination** is the local path to save SmugMug pictures and videos.  
 If the folder is not empty, then only new or changed files will be downloaded.
 
+> **Windows users**: the value of `destination` must use slash `/` or double backslash `\\`
+> 
+> Examples:
+> ```toml
+> destination = "C:/folder/subfolder"
+> destination = "C:\\folder\\subfolder"
+> destination = "/folder/subfolder" # This writes to the primary partition C:
+> ```
+
 **file_names** is a string including template replacements that will be used to build the file
 names for the files on disk. Accepted keys are `FileName`, `ImageKey`, `ArchivedMD5` and `UploadKey`
 and their values comes from the AlbumImage API response. If an invalid replacement is used,
