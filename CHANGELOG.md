@@ -17,11 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+-
+
+### Fixed
+
 - 
 
 ### Maintenance
 
 - 
+
+## [v1.2.2](https://github.com/tommyblue/smugmug-backup/tree/v1.2.2) - 2020-11-27
+
+### Fixed
+
+- Fix `destination` path under Windows
 
 ## [v1.2.1](https://github.com/tommyblue/smugmug-backup/tree/v1.2.1) - 2020-09-25
 
