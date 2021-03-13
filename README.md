@@ -75,10 +75,25 @@ If the folder is not empty, then only new or changed files will be downloaded.
 > destination = "/folder/subfolder" # This writes to the primary partition C:
 > ```
 
-**file_names** is a string including template replacements that will be used to build the file
-names for the files on disk. Accepted keys are `FileName`, `ImageKey`, `ArchivedMD5` and `UploadKey`
-and their values comes from the AlbumImage API response. If an invalid replacement is used,
-an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.  
+**file_names** is a string that will be used to build the name for each local file. This 
+string typically includes one or more [go template annotations](https://golang.org/pkg/text/template/), which evaluate
+to values discovered about the remote file from each SmugMug AlbumImage API response. 
+Accepted annotations are:
+* `{{ .FileName }}` (default)
+* `{{ .ImageKey }}`
+* `{{ .ArchivedMD5 }}`
+* `{{ .UploadKey }}`
+
+If an invalid replacement is used, an error is returned. 
+
+> Examples:
+> ```toml
+> file_names = "{{ .FileName }}" # uses the filename as it exists on SmugMug, verbatim
+> # NB: The dot . is critical! This will just create (and re-create!) a file named 
+> # "FileName" in each folder
+> file_names = "{{ FileName }}"
+> file_names = "{{ .FileName-.ArchivedMD5 }}" # SmugMug filename and File MD5 joined by '-'
+> ```
 
 When **use_metadata_times** is true, then the last modification timestamp of the objects will
 be set based on SmugMug metadata for newly downloaded files. If also **force_metadata_times** is true, then the timestamp is applied to all existing files.
