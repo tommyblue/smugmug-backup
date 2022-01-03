@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"html/template"
+	"strings"
 	"time"
 )
 
@@ -83,16 +84,29 @@ type albumImage struct {
 		} `json:"LargestVideo"`
 	} `json:"Uris"`
 
-	fileDatetime  time.Time
-	builtFilename string // The final filename, after template replacements
+	fileDatetime                  time.Time
+	builtFilename                 string // The final filename, after template replacements
+	PreferredDisplayFileExtension string `json:"PreferredDisplayFileExtension"`
 }
 
 func (a *albumImage) buildFilename(tmpl *template.Template) error {
 	replacementVars := map[string]string{
-		"FileName":    a.FileName,
-		"ImageKey":    a.ImageKey,
-		"ArchivedMD5": a.ArchivedMD5,
-		"UploadKey":   a.UploadKey,
+		"FileName":      a.FileName,
+		"ImageKey":      a.ImageKey,
+		"ArchivedMD5":   a.ArchivedMD5,
+		"UploadKey":     a.UploadKey,
+		"FileNameNoExt": a.FileName,
+		"Extension":     a.PreferredDisplayFileExtension,
+	}
+
+	fileExtLoc := strings.LastIndex(a.FileName, ".")
+
+	if fileExtLoc == 0 {
+		return errors.New("Invalid file name. Cannot start with a period.")
+	}
+	if fileExtLoc != -1 {
+		replacementVars["FileNameNoExt"] = a.FileName[:fileExtLoc]
+		replacementVars["Extension"] = a.FileName[fileExtLoc+1 : len(a.FileName)]
 	}
 
 	var builtFilename bytes.Buffer
