@@ -2,7 +2,6 @@ package smugmug
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -105,7 +104,6 @@ func TestRun(t *testing.T) {
 }
 
 type testConf struct {
-	username    string
 	destination string
 	apiKey      string
 	apiSecret   string
@@ -141,7 +139,7 @@ destination = "%s"
 	dir := t.TempDir()
 
 	file := filepath.Join(dir, "config.toml")
-	err := ioutil.WriteFile(file, cfgFile, 0644)
+	err := os.WriteFile(file, cfgFile, 0644)
 	if err != nil {
 		t.Fatalf("Can't create config file for testing")
 	}
@@ -227,23 +225,23 @@ func TestReadConfOverrides(t *testing.T) {
 		t.Fatalf("unexpected err %v", err)
 	}
 
-	if "overridden_dest" != cfg.Destination {
+	if cfg.Destination != "overridden_dest" {
 		t.Fatalf("destination: want: %s, got: %s", "overridden_dest", cfg.Destination)
 	}
 
-	if "overridden_apikey" != cfg.ApiKey {
+	if cfg.ApiKey != "overridden_apikey" {
 		t.Fatalf("apiKey: want: %s, got: %s", "overridden_apikey", cfg.ApiKey)
 	}
 
-	if "overridden_apisecret" != cfg.ApiSecret {
+	if cfg.ApiSecret != "overridden_apisecret" {
 		t.Fatalf("apiSecret: want: %s, got: %s", "overridden_apisecret", cfg.ApiSecret)
 	}
 
-	if "overridden_usertoken" != cfg.UserToken {
+	if cfg.UserToken != "overridden_usertoken" {
 		t.Fatalf("userToken: want: %s, got: %s", "overridden_usertoken", cfg.UserToken)
 	}
 
-	if "overridden_usersecret" != cfg.UserSecret {
+	if cfg.UserSecret != "overridden_usersecret" {
 		t.Fatalf("userSecret: want: %s, got: %s", "overridden_usersecret", cfg.UserSecret)
 	}
 }
@@ -299,11 +297,11 @@ func TestReadConfMissingFileValues(t *testing.T) {
 		t.Fatalf("userToken: want: %s, got: %s", cfgObj.userToken, cfg.UserToken)
 	}
 
-	if "overridden_apisecret" != cfg.ApiSecret {
+	if cfg.ApiSecret != "overridden_apisecret" {
 		t.Fatalf("apiSecret: want: %s, got: %s", "overridden_apisecret", cfg.ApiSecret)
 	}
 
-	if "overridden_usersecret" != cfg.UserSecret {
+	if cfg.UserSecret != "overridden_usersecret" {
 		t.Fatalf("userSecret: want: %s, got: %s", "overridden_usersecret", cfg.UserSecret)
 	}
 }

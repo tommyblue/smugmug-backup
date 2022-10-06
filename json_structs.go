@@ -83,7 +83,6 @@ type albumImage struct {
 		} `json:"LargestVideo"`
 	} `json:"Uris"`
 
-	fileDatetime  time.Time
 	builtFilename string // The final filename, after template replacements
 }
 
@@ -102,7 +101,7 @@ func (a *albumImage) buildFilename(tmpl *template.Template) error {
 
 	a.builtFilename = builtFilename.String()
 	if a.builtFilename == "" {
-		return errors.New("Empty resulting name")
+		return errors.New("empty resulting name")
 	}
 	return nil
 }

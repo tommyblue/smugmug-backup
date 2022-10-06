@@ -45,7 +45,7 @@ func (w *Worker) albums(firstURI string) ([]album, error) {
 	for uri != "" {
 		var a albumsResponse
 		if err := w.req.get(uri, &a); err != nil {
-			return albums, fmt.Errorf("Error getting albums from %s. Error: %v", uri, err)
+			return albums, fmt.Errorf("error getting albums from %s. Error: %v", uri, err)
 		}
 		albums = append(albums, a.Response.Album...)
 		uri = a.Response.Pages.NextPage
@@ -61,13 +61,13 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 	for uri != "" {
 		var a albumImagesResponse
 		if err := w.req.get(uri, &a); err != nil {
-			return images, fmt.Errorf("Error getting album images from %s. Error: %v", uri, err)
+			return images, fmt.Errorf("error getting album images from %s. Error: %v", uri, err)
 		}
 		// Loop over response in inject the albumPath and then append to the images
 		for _, i := range a.Response.AlbumImage {
 			i.AlbumPath = albumPath
 			if err := i.buildFilename(w.filenameTmpl); err != nil {
-				return nil, fmt.Errorf("Cannot build image filename: %v", err)
+				return nil, fmt.Errorf("cannot build image filename: %v", err)
 			}
 			images = append(images, i)
 		}
@@ -103,7 +103,7 @@ func (w *Worker) saveImages(images []albumImage, folder string) {
 // saveImage saves an image to the given folder unless its name is empty
 func (w *Worker) saveImage(image albumImage, folder string) error {
 	if image.Name() == "" {
-		return errors.New("Unable to find valid image filename, skipping..")
+		return errors.New("unable to find valid image filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 	log.Debug(image.ArchivedUri)
@@ -123,18 +123,18 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 // saveVideo saves a video to the given folder unless its name is empty od is still under processing
 func (w *Worker) saveVideo(image albumImage, folder string) error {
 	if image.Name() == "" {
-		return errors.New("Unable to find valid video filename, skipping..")
+		return errors.New("unable to find valid video filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
 	if image.Processing { // Skip videos if under processing
-		return fmt.Errorf("Skipping video %s because under processing, %#v\n", image.Name(), image)
+		return fmt.Errorf("skipping video %s because under processing, %#v", image.Name(), image)
 	}
 
 	var v albumVideo
 	log.Debug("(saveVideo) getting ", image.Uris.LargestVideo.Uri)
 	if err := w.req.get(image.Uris.LargestVideo.Uri, &v); err != nil {
-		return fmt.Errorf("Cannot get URI for video %+v. Error: %v", image, err)
+		return fmt.Errorf("cannot get URI for video %+v. Error: %v", image, err)
 	}
 
 	ok, err := w.downloadFn(dest, v.Response.LargestVideo.Url, v.Response.LargestVideo.Size)
@@ -156,7 +156,7 @@ func (w *Worker) setChTime(image albumImage, dest string) error {
 		created = w.imageTimestamp(image)
 	}
 	if !created.IsZero() {
-		log.Debugf("Setting chtime %v for %s", created, dest)
+		log.Debugf("setting chtime %v for %s", created, dest)
 		return os.Chtimes(dest, time.Now(), created)
 	}
 

@@ -71,12 +71,12 @@ func (cfg *Conf) validate() error {
 	}
 
 	if cfg.Destination == "" {
-		return errors.New("Destination can't be empty")
+		return errors.New("destination can't be empty")
 	}
 
 	// Check exising and writeability of destination folder
 	if err := checkDestFolder(cfg.Destination); err != nil {
-		return fmt.Errorf("Can't find in the destination folder %s: %v", cfg.Destination, err)
+		return fmt.Errorf("can't find in the destination folder %s: %v", cfg.Destination, err)
 	}
 
 	return nil
@@ -96,7 +96,7 @@ func ReadConf() (*Conf, error) {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, errors.New("Configuration file not found in ./config.toml or $HOME/.smgmg/config.toml")
+			return nil, errors.New("configuration file not found in ./config.toml or $HOME/.smgmg/config.toml")
 		} else {
 			return nil, err
 		}
@@ -120,7 +120,7 @@ func ReadConf() (*Conf, error) {
 	cfg.overrideEnvConf()
 
 	if !cfg.UseMetadataTimes && cfg.ForceMetadataTimes {
-		return nil, errors.New("Cannot use store.force_metadata_times without store.use_metadata_times")
+		return nil, errors.New("cannot use store.force_metadata_times without store.use_metadata_times")
 	}
 
 	return cfg, nil
@@ -175,22 +175,22 @@ func buildFilenameTemplate(filenameTemplate string) (*template.Template, error) 
 //
 //   - Get user albums
 //   - Iterate over all albums and:
-//     - create folder
-//     - iterate over all images and videos
-//       - if existing and with the same size, then skip
-//       - if not, download
+//   - create folder
+//   - iterate over all images and videos
+//   - if existing and with the same size, then skip
+//   - if not, download
 func (w *Worker) Run() error {
 	var err error
 	w.cfg.username, err = w.currentUser()
 	if err != nil {
-		return fmt.Errorf("Error checking credentials: %v", err)
+		return fmt.Errorf("error checking credentials: %v", err)
 	}
 
 	// Get user albums
 	log.Infof("Getting albums for user %s...\n", w.cfg.username)
 	albums, err := w.userAlbums()
 	if err != nil {
-		return fmt.Errorf("Error getting user albums: %v", err)
+		return fmt.Errorf("error getting user albums: %v", err)
 	}
 
 	log.Infof("Found %d albums\n", len(albums))
@@ -207,7 +207,7 @@ func (w *Worker) Run() error {
 		log.Debugf("[ALBUM IMAGES] %s", album.Uris.AlbumImages.URI)
 		images, err := w.albumImages(album.Uris.AlbumImages.URI, album.URLPath)
 		if err != nil {
-			log.WithError(err).Errorf("Cannot get album images for %s", album.Uris.AlbumImages.URI)
+			log.WithError(err).Errorf("cannot get album images for %s", album.Uris.AlbumImages.URI)
 			w.errors++
 			continue
 		}
@@ -218,7 +218,7 @@ func (w *Worker) Run() error {
 	}
 
 	if w.errors > 0 {
-		return fmt.Errorf("Completed with %d errors, please check logs", w.errors)
+		return fmt.Errorf("completed with %d errors, please check logs", w.errors)
 	}
 
 	log.Info("Backup completed.")

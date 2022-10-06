@@ -19,7 +19,7 @@ func createFolder(path string) error {
 
 	log.Infof("Creating folder %s\n", path)
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
-		return fmt.Errorf("Cannot create folder: %v", err)
+		return fmt.Errorf("cannot create folder: %v", err)
 	}
 
 	return nil
@@ -27,16 +27,16 @@ func createFolder(path string) error {
 
 func checkDestFolder(folderPath string) error {
 	if !filepath.IsAbs(folderPath) {
-		return errors.New("Destination path must be an absolute path")
+		return errors.New("destination path must be an absolute path")
 	}
 
 	info, err := os.Stat(folderPath)
 	if err != nil {
-		return errors.New("Destination path doesn't exist")
+		return errors.New("destination path doesn't exist")
 	}
 
 	if !info.IsDir() {
-		return errors.New("Destination path isn't a directory")
+		return errors.New("destination path isn't a directory")
 	}
 
 	return nil

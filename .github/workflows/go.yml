@@ -35,10 +35,10 @@ jobs:
       - name: Test
         run: make test
 
-    #   - name: Linting
-    #     run: |
-    #         go install honnef.co/go/tools/cmd/staticcheck@latest
-    #         staticcheck ./...
+      - name: Linting
+        run: |
+            go install honnef.co/go/tools/cmd/staticcheck@latest
+            staticcheck ./...
 
       - name: govulncheck
         run: |
