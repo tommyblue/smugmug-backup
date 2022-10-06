@@ -1,7 +1,6 @@
 package smugmug_test
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -13,10 +12,7 @@ func TestNew(t *testing.T) {
 	ok_dir := t.TempDir()
 
 	// Create and immediately delete a folder, so we are sure it doesn't exist
-	unexisting_dir, err := ioutil.TempDir("/tmp", "smugmug-backup")
-	if err != nil {
-		t.Fatal(err)
-	}
+	unexisting_dir := t.TempDir()
 	os.RemoveAll(unexisting_dir)
 
 	tests := []struct {

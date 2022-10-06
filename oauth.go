@@ -109,15 +109,6 @@ func (cfg *oauthConf) getHMACSignature(urlStr string, oauthParams map[string]str
 	return signature
 }
 
-func (cfg *oauthConf) getSignature() string {
-	rawSignature := encode(cfg.apiSecret, false)
-	rawSignature = append(rawSignature, '&')
-	// if r.credentials != nil {
-	rawSignature = append(rawSignature, encode(cfg.userSecret, false)...)
-	// }
-	return string(rawSignature)
-}
-
 // noscape[b] is true if b should not be escaped per section 3.6 of the RFC.
 var noEscape = [256]bool{
 	'A': true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,

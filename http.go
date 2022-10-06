@@ -34,7 +34,7 @@ func newHTTPHandler(apiKey, apiSecret, userToken, userSecret string) *handler {
 // get calls getJSON with the given url
 func (s *handler) get(url string, obj interface{}) error {
 	if url == "" {
-		return errors.New("Can't get empty url")
+		return errors.New("can't get empty url")
 	}
 	return s.getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
 }
@@ -104,7 +104,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 	var resp *http.Response
 	var errorsList []error
 	for i := 1; i <= maxRetries; i++ {
-		req, err := http.NewRequest("GET", url, nil)
+		req, _ := http.NewRequest("GET", url, nil)
 
 		// Auth header must be generate every time (nonce must change)
 		h, err := s.oauth.authorizationHeader(url)
@@ -126,7 +126,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 				for _, e := range errorsList {
 					log.Error(e)
 				}
-				return nil, errors.New("Too many errors")
+				return nil, errors.New("too many errors")
 			}
 			// Go on and try again after a little pause
 			time.Sleep(2 * time.Second)
@@ -139,7 +139,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 				for _, e := range errorsList {
 					log.Error(e)
 				}
-				return nil, errors.New("Too many errors")
+				return nil, errors.New("too many errors")
 			}
 
 			if r.StatusCode == 429 {
