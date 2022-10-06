@@ -11,12 +11,12 @@ import (
 	"github.com/tommyblue/smugmug-backup"
 )
 
+var statsAddr = "localhost:6060"
+
 // Use `-ldflags "-X main.version=someversion"` when building baker to set this value
 var version = "-- unknown --"
 var flagVersion = flag.Bool("version", false, "print version number")
-var flagStats = flag.Bool("stats", false, "print version number")
-
-var statsAddr = "localhost:6060"
+var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
