@@ -16,3 +16,5 @@
 /smugmug-backup
 /smugmug-backup-linux
 dist/
+/config.toml
+/backup
