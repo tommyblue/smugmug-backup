@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/arl/statsviz"
 	log "github.com/sirupsen/logrus"
 	"github.com/tommyblue/smugmug-backup"
 )
@@ -12,6 +14,9 @@ import (
 // Use `-ldflags "-X main.version=someversion"` when building baker to set this value
 var version = "-- unknown --"
 var flagVersion = flag.Bool("version", false, "print version number")
+var flagStats = flag.Bool("stats", false, "print version number")
+
+var statsAddr = "localhost:6060"
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
@@ -31,6 +36,14 @@ func main() {
 	if *flagVersion {
 		fmt.Printf("Version: %s\n", version)
 		return
+	}
+
+	if *flagStats {
+		statsviz.RegisterDefault()
+		go func() {
+			log.Infof("Stats available at: http://%s/debug/statsviz/\n", statsAddr)
+			log.Println(http.ListenAndServe(statsAddr, nil))
+		}()
 	}
 
 	cfg, err := smugmug.ReadConf()

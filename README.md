@@ -20,6 +20,7 @@ You can run the app multiple times, all exising files will be skipped if their s
       - [Alternative ways to obtain the tokens](#alternative-ways-to-obtain-the-tokens)
   - [Build and install](#build-and-install)
   - [Debug for errors](#debug-for-errors)
+  - [Visualize software stats](#visualize-software-stats)
   - [Credits](#credits)
   - [Bugs and contributing](#bugs-and-contributing)
 
@@ -67,8 +68,9 @@ The **destination** is the local path to save SmugMug pictures and videos.
 If the folder is not empty, then only new or changed files will be downloaded.
 
 > **Windows users**: the value of `destination` must use slash `/` or double backslash `\\`
-> 
+>
 > Examples:
+>
 > ```toml
 > destination = "C:/folder/subfolder"
 > destination = "C:\\folder\\subfolder"
@@ -78,7 +80,7 @@ If the folder is not empty, then only new or changed files will be downloaded.
 **file_names** is a string including template replacements that will be used to build the file
 names for the files on disk. Accepted keys are `FileName`, `ImageKey`, `ArchivedMD5` and `UploadKey`
 and their values comes from the AlbumImage API response. If an invalid replacement is used,
-an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.  
+an error is returned. If the conf key is omitted or is empty, then `{{.FileName}}` is used.
 
 When **use_metadata_times** is true, then the last modification timestamp of the objects will
 be set based on SmugMug metadata for newly downloaded files. If also **force_metadata_times** is true, then the timestamp is applied to all existing files.
@@ -86,7 +88,7 @@ be set based on SmugMug metadata for newly downloaded files. If also **force_met
 > The **use_metadata_times** can be required if you notice that the images creation datetime is
 > wrong by ~7h. This is a bug in the SmugMug Uploader: "Our uploader process currently isn't
 > time zone aware and takes the DateTimeOriginal field without time zone information".
-> 
+>
 > The solution is to use the Metadata API endpoint to retrieve the EXIF informations, but it
 > requires an additional API call for each image/video.  
 > In my case, a full backup that requires ~10 minutes, increases to 2+ hours with this option.
@@ -109,7 +111,7 @@ connection speed. Check the command line logs to see what's going on.
 
 ## Credentials
 
-SmugMug requires *OAuth1 authentication*. OAuth1 requires 4 values: an API key and secret that
+SmugMug requires _OAuth1 authentication_. OAuth1 requires 4 values: an API key and secret that
 identify the app with SmugMug and that you can get from SmugMug registering the app and
 user credentials (token and secret) that each user must obtain (those credentials authorize
 the app to access the user's data).
@@ -184,6 +186,11 @@ To increase the logging, export a `DEBUG=1` environment variable:
 ```sh
 DEBUG=1 ./smugmug-backup
 ```
+
+## Visualize software stats
+
+In case you want to monitor the software performances you can use the `-stats` flag to enable
+[statsviz](https://github.com/arl/statsviz) debug page (available at http://localhost:6060/debug/statsviz/)
 
 ## Credits
 

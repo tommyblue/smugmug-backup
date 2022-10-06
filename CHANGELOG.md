@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--
+- Add `-stats` flag to enable [statsviz](https://github.com/arl/statsviz) https://github.com/tommyblue/smugmug-backup/pull/32
 
 ### Changed
 
