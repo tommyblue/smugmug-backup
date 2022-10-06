@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 
+-
 
 ### Changed
 
-- 
+-
 
 ### Removed
 
@@ -21,11 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- 
+-
 
 ### Maintenance
 
-- 
+- Updated dependencies https://github.com/tommyblue/smugmug-backup/pull/30
 
 ## [v1.2.2](https://github.com/tommyblue/smugmug-backup/tree/v1.2.2) - 2020-11-27
 
@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- 
+-
 
 ### Removed
 
