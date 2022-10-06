@@ -3,12 +3,14 @@ module github.com/tommyblue/smugmug-backup
 go 1.19
 
 require (
+	github.com/arl/statsviz v0.5.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.13.0
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
