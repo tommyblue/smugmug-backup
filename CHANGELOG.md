@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `-stats` flag to enable [statsviz](https://github.com/arl/statsviz) https://github.com/tommyblue/smugmug-backup/pull/32
+- 
 
 ### Changed
 
@@ -25,7 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
-- Updated dependencies https://github.com/tommyblue/smugmug-backup/pull/30
+-
+
+## [v1.3.0](https://github.com/tommyblue/smugmug-backup/tree/v1.3.0) - 2023-02-27
+
+### Added
+
+- Add `-stats` flag to enable [statsviz](https://github.com/arl/statsviz) https://github.com/tommyblue/smugmug-backup/pull/32
+
+### Maintenance
+
+- Updated dependencies
+- Update go to 1.20.1
 
 ## [v1.2.2](https://github.com/tommyblue/smugmug-backup/tree/v1.2.2) - 2020-11-27
 
