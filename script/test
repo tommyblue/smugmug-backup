@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+cd "$(dirname "${0}")/../"
+
+if ! command -v gotestsum > /dev/null
+then
+    go install gotest.tools/gotestsum@latest
+fi
+
+gotestsum --format testname -- -shuffle=on -cover -race -v -count=1 ./...
