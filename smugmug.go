@@ -21,8 +21,10 @@ type Conf struct {
 	Filenames          string // Template for files naming
 	UseMetadataTimes   bool   // When true, the last update timestamp will be retrieved from metadata
 	ForceMetadataTimes bool   // When true, then the last update timestamp is always retrieved and overwritten, also for existing files
+	WriteCSV           bool   // When true, a CSV file including downloaded files metadata is written
 
-	username string
+	username     string
+	metadataFile string
 }
 
 // overrideEnvConf overrides any configuration value if the
@@ -115,6 +117,7 @@ func ReadConf() (*Conf, error) {
 		Filenames:          viper.GetString("store.file_names"),
 		UseMetadataTimes:   viper.GetBool("store.use_metadata_times"),
 		ForceMetadataTimes: viper.GetBool("store.force_metadata_times"),
+		WriteCSV:           viper.GetBool("store.write_csv"),
 	}
 
 	cfg.overrideEnvConf()
@@ -126,6 +129,13 @@ func ReadConf() (*Conf, error) {
 	return cfg, nil
 }
 
+type FileMetadata struct {
+	FileName    string
+	ArchivedUri string
+	Caption     string
+	Keywords    string
+}
+
 // Worker actually implements the backup logic
 type Worker struct {
 	req          requestsHandler
@@ -133,6 +143,7 @@ type Worker struct {
 	errors       int
 	downloadFn   func(string, string, int64) (bool, error) // defined in struct for better testing
 	filenameTmpl *template.Template
+	metadata     []FileMetadata
 }
 
 // New return a SmugMug backup configuration. It returns an error if it fails parsing
@@ -147,6 +158,11 @@ func New(cfg *Conf) (*Worker, error) {
 	tmpl, err := buildFilenameTemplate(cfg.Filenames)
 	if err != nil {
 		return nil, err
+	}
+
+	if cfg.WriteCSV {
+		cfg.metadataFile = filepath.Join(cfg.Destination, METADATA_FNAME)
+		createMetadataCSV(cfg.metadataFile)
 	}
 
 	return &Worker{
@@ -195,6 +211,7 @@ func (w *Worker) Run() error {
 
 	log.Infof("Found %d albums\n", len(albums))
 
+	// TODO: add concurrency?
 	for _, album := range albums {
 		folder := filepath.Join(w.cfg.Destination, album.URLPath)
 
@@ -215,6 +232,9 @@ func (w *Worker) Run() error {
 		log.Debugf("Got album images for %s", album.Uris.AlbumImages.URI)
 		log.Debugf("%+v", images)
 		w.saveImages(images, folder)
+		if w.cfg.WriteCSV {
+			w.writeToCSV(images)
+		}
 	}
 
 	if w.errors > 0 {

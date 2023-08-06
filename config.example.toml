@@ -1,0 +1,12 @@
+[authentication]
+api_key = "<API Key>"
+api_secret = "<API Secret>"
+user_token = "<User Token>"
+user_secret = "<User Secret>"
+
+[store]
+destination = "<Backup destination folder>"
+file_names = "<Filename with template replacements>"
+use_metadata_times = true
+force_metadata_times = true
+write_csv = true

@@ -34,21 +34,7 @@ Releases for multiple systems (including ARM) can be found in the
 The app expects to find the [TOML](https://github.com/toml-lang/toml) configuration file in
 `./config.toml` or `$HOME/.smgmg/config.toml`.
 
-The configuration file must have this structure:
-
-```toml
-[authentication]
-api_key = "<API Key>"
-api_secret = "<API Secret>"
-user_token = "<User Token>"
-user_secret = "<User Secret>"
-
-[store]
-destination = "<Backup destination folder>"
-file_names = "<Filename with template replacements>"
-use_metadata_times = true
-force_metadata_times = true
-```
+For the configuration structure, check the [config.example.toml](./config.example.toml) file.
 
 Some values can be overridden by environment variables, that have the following names:
 
@@ -60,9 +46,6 @@ SMGMG_BK_USER_SECRET = "<User Secret>"
 SMGMG_BK_DESTINATION = "<Backup destination folder>"
 SMGMG_BK_FILE_NAMES = "<Filename with template replacements>"
 ```
-
-All configuration values are required. They can be omitted in the configuration file
-as long as they are overridden by environment values.
 
 The **destination** is the local path to save SmugMug pictures and videos.  
 If the folder is not empty, then only new or changed files will be downloaded.
@@ -92,6 +75,9 @@ be set based on SmugMug metadata for newly downloaded files. If also **force_met
 > The solution is to use the Metadata API endpoint to retrieve the EXIF informations, but it
 > requires an additional API call for each image/video.  
 > In my case, a full backup that requires ~10 minutes, increases to 2+ hours with this option.
+
+When **write_csv** is true, a `metadata.csv` file is created (or overwritten) storing some
+information about the user files (both downloaded or skipped).
 
 **api_key**, **api_secret**, **user_token** and **user_secret** are the required credentials for
 authenticating with the SmugMug API.  
