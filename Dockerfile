@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=en_US.UTF-8 \
@@ -18,9 +18,9 @@ RUN sed -e "/deb-src/d" -i /etc/apt/sources.list \
     && rm -rf /.root/cache \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://dl.google.com/go/go1.15.2.linux-amd64.tar.gz ./go.tar.gz
+ADD https://dl.google.com/go/go1.20.7.linux-amd64.tar.gz ./go.tar.gz
 
-RUN echo "b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552 go.tar.gz" | sha256sum -c - && \
+RUN echo "f0a87f1bcae91c4b69f8dc2bc6d7e6bfcd7524fceec130af525058c0c17b1b44 go.tar.gz" | sha256sum -c - && \
     tar -C /usr/local -xzf go.tar.gz && \
     rm ./go.tar.gz
 

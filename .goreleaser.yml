@@ -10,8 +10,8 @@ builds:
       - darwin
       - windows
     goarch:
-      - amd64
-      - 386
+      - x86_64
+      - i386
       - arm
       - arm64
     goarm:
@@ -19,17 +19,10 @@ builds:
       - 7
     ignore:
       - goos: darwin
-        goarch: 386
+        goarch: i386
     env:
       - CGO_ENABLED=0
       - GOFLAGS=-mod=vendor
-archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:

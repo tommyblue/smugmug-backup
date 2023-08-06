@@ -12,8 +12,10 @@ jobs:
           check-latest: true
         id: go
 
-      - name: Check out code into the Go module directory
+      - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: actions/cache@v3
         with:
@@ -52,9 +54,10 @@ jobs:
         run: make build
 
       - name: GoReleaser Action
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v4
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
