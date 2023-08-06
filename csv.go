@@ -36,14 +36,14 @@ func createMetadataCSV(fpath string) error {
 }
 
 // buildMetadata returns the data to be added to the metadata CSV file
-func (w *Worker) buildMetadata(a albumImage) []string {
+func (w *Worker) buildMetadata(a albumImage, folder string) []string {
 	ftype := "image"
 	if a.IsVideo {
 		ftype = "video"
 	}
 
 	return []string{
-		a.builtFilename,
+		fmt.Sprintf("%s/%s", folder, a.Name()),
 		ftype,
 		a.ArchivedUri,
 		a.Caption,
@@ -54,7 +54,7 @@ func (w *Worker) buildMetadata(a albumImage) []string {
 }
 
 // writeToCSV writes images metadata to CSV file
-func (w *Worker) writeToCSV(images []albumImage) {
+func (w *Worker) writeToCSV(images []albumImage, folder string) {
 	file, err := os.OpenFile(w.cfg.metadataFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		log.Errorf("cannot open metadata CSV file: %v", err)
@@ -70,7 +70,7 @@ func (w *Worker) writeToCSV(images []albumImage) {
 	}()
 
 	for _, img := range images {
-		if err := writer.Write(w.buildMetadata(img)); err != nil {
+		if err := writer.Write(w.buildMetadata(img, folder)); err != nil {
 			log.Errorf("cannot write to metadata CSV file: %v", err)
 		}
 	}

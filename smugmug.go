@@ -233,7 +233,7 @@ func (w *Worker) Run() error {
 		log.Debugf("%+v", images)
 		w.saveImages(images, folder)
 		if w.cfg.WriteCSV {
-			w.writeToCSV(images)
+			w.writeToCSV(images, folder)
 		}
 	}
 

@@ -68,7 +68,7 @@ func Test_writeToCSV(t *testing.T) {
 		},
 	}
 
-	w.writeToCSV(images)
+	w.writeToCSV(images, "test")
 
 	f, err := os.Open(fpath)
 	if err != nil {
