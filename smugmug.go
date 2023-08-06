@@ -143,7 +143,6 @@ type Worker struct {
 	errors       int
 	downloadFn   func(string, string, int64) (bool, error) // defined in struct for better testing
 	filenameTmpl *template.Template
-	metadata     []FileMetadata
 }
 
 // New return a SmugMug backup configuration. It returns an error if it fails parsing
