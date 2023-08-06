@@ -63,6 +63,14 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 		if err := w.req.get(uri, &a); err != nil {
 			return images, fmt.Errorf("error getting album images from %s. Error: %v", uri, err)
 		}
+
+		// If the album is empty, a.Response.AlbumImage is missing instead of an empty array (weird...)
+		if a.Response.AlbumImage == nil {
+			log.Infof("album is empty: %s", albumPath)
+
+			break
+		}
+
 		// Loop over response in inject the albumPath and then append to the images
 		for _, i := range a.Response.AlbumImage {
 			i.AlbumPath = albumPath
