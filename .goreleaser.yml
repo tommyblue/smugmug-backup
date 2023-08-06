@@ -10,8 +10,8 @@ builds:
       - darwin
       - windows
     goarch:
-      - x86_64
-      - i386
+      - amd64
+      - 386
       - arm
       - arm64
     goarm:

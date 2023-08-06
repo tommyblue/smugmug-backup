@@ -25,7 +25,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
--
+
+
+## [v1.4.0](https://github.com/tommyblue/smugmug-backup/tree/v1.4.0) - 2023-08-06
+
+### Added
+
+- store files metadata to csv [#26]
+
+### Maintenance
+
+- Updated dependencies
+- Update Dockerfile to ubuntu 22.04 and go v1.20.7
+- Update goreleaser
+
+## Fixed
+- fix exception when album is empty [#39]
+
 ## [v1.3.1](https://github.com/tommyblue/smugmug-backup/tree/v1.3.1) - 2023-05-03
 
 ### Maintenance
