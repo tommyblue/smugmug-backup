@@ -18,6 +18,7 @@ var statsAddr = "localhost:6060"
 var version = "-- unknown --"
 var flagVersion = flag.Bool("version", false, "print version number")
 var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
+var cfgPath = flag.String("cfg", "", "folder containing configuration file")
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
@@ -48,10 +49,12 @@ func main() {
 	}
 	start := time.Now()
 
-	cfg, err := smugmug.ReadConf()
+	cfg, err := smugmug.ReadConf(*cfgPath)
 	if err != nil {
 		log.WithError(err).Fatal("Configuration error")
 	}
+
+	log.Debugf("Used configuration:\n%+v", cfg)
 
 	wrk, err := smugmug.New(cfg)
 	if err != nil {

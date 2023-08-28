@@ -87,9 +87,12 @@ func (cfg *Conf) validate() error {
 // ReadConf produces a configuration object for the Smugmug worker.
 //
 // It reads the configuration from ./config.toml or "$HOME/.smgmg/config.toml"
-func ReadConf() (*Conf, error) {
+func ReadConf(cfgPath string) (*Conf, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
+	if cfgPath != "" {
+		viper.AddConfigPath(cfgPath)
+	}
 	viper.AddConfigPath("$HOME/.smgmg")
 	viper.AddConfigPath(".")
 

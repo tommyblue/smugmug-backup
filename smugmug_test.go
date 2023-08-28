@@ -169,7 +169,7 @@ func TestReadConf(t *testing.T) {
 
 	defer setupConfFile(t, cfgObj, false)()
 
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
 	}
@@ -220,7 +220,7 @@ func TestReadConfOverrides(t *testing.T) {
 		os.Unsetenv("SMGMG_BK_USER_TOKEN")
 		os.Unsetenv("SMGMG_BK_USER_SECRET")
 	}()
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
 	}
@@ -261,7 +261,7 @@ func TestReadConfMissingFileValues(t *testing.T) {
 	defer setupConfFile(t, cfgObj, true)()
 
 	// expected the conf to return an error
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("Unexpected err: %v", err)
 	}
@@ -277,7 +277,7 @@ func TestReadConfMissingFileValues(t *testing.T) {
 		os.Unsetenv("SMGMG_BK_USER_SECRET")
 	}()
 	// now it must work
-	cfg, err = ReadConf()
+	cfg, err = ReadConf("")
 	if err != nil {
 		t.Fatalf("Unexpected err: %v", err)
 	}
