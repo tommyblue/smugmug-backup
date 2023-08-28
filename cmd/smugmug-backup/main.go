@@ -56,8 +56,6 @@ func main() {
 		log.WithError(err).Fatal("Configuration error")
 	}
 
-	log.Debugf("Used configuration:\n%+v", cfg)
-
 	wrk, err := smugmug.New(cfg)
 	if err != nil {
 		log.WithError(err).Fatal("Can't initialize the package")
