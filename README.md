@@ -10,8 +10,11 @@ folder, replicating the SmugMug paths.
 
 You can run the app multiple times, all exising files will be skipped if their sizes match.
 
+With a good internet connection, a full backup of ~200GB can be completed in around 90 minutes using 10 analyzers and 10 downloaders (see #configuration for these options tuning) and few minutes for a daily incremental backup.
+
 - [SmugMug backup](#smugmug-backup)
   - [Releases](#releases)
+  - [Automated backups](#automated-backups)
   - [Configuration](#configuration)
   - [Run](#run)
   - [Credentials](#credentials)
@@ -28,6 +31,19 @@ You can run the app multiple times, all exising files will be skipped if their s
 
 Releases for multiple systems (including ARM) can be found in the
 [project releases page](https://github.com/tommyblue/smugmug-backup/releases)
+
+## Automated backups
+
+As mentioned above, the app can be executed multiple times with the same configuration to perform incremental backups.  
+My suggestion is to use a linux home server (like a RaspberryPI with an attached NAS or external disk) and use `cron` to execute the backup daily.
+
+A simple setup includes the configuration file into `$HOME/.smgmg/config.toml`, the binary file into `$HOME/bin/smugmug-backup` and this simple line into user's crontab (run `crontab -e` to edit the crontab configuration):
+
+```
+3 4 * * * $HOME/bin/smugmug-backup
+```
+
+If your system is configured to send emails then you'll also receive a daily recap of the backup job in your inbox :tada:
 
 ## Configuration
 
