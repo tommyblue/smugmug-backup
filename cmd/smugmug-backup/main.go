@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/arl/statsviz"
 	log "github.com/sirupsen/logrus"
@@ -17,6 +20,7 @@ var statsAddr = "localhost:6060"
 var version = "-- unknown --"
 var flagVersion = flag.Bool("version", false, "print version number")
 var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
+var cfgPath = flag.String("cfg", "", "folder containing configuration file")
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
@@ -45,8 +49,9 @@ func main() {
 			log.Println(http.ListenAndServe(statsAddr, nil))
 		}()
 	}
+	start := time.Now()
 
-	cfg, err := smugmug.ReadConf()
+	cfg, err := smugmug.ReadConf(*cfgPath)
 	if err != nil {
 		log.WithError(err).Fatal("Configuration error")
 	}
@@ -56,7 +61,24 @@ func main() {
 		log.WithError(err).Fatal("Can't initialize the package")
 	}
 
-	if err := wrk.Run(); err != nil {
-		log.Fatal(err)
-	}
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	end := make(chan struct{})
+	go func() {
+		if err := wrk.Run(); err != nil {
+			log.Fatal(err)
+		}
+		end <- struct{}{}
+	}()
+
+	go func() {
+		<-sigs
+		log.Info("Stopping...")
+		wrk.Stop()
+	}()
+
+	<-end
+	duration := time.Since(start)
+	log.Infof("Backup completed in %s", duration)
 }

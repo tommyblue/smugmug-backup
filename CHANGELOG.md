@@ -26,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Maintenance
 
 
+## [v1.5.0](https://github.com/tommyblue/smugmug-backup/tree/v1.5.0) - 2023-08-28
+
+### Added
+
+- Add concurrent file download and user album analysis with new `store.concurrent_downloads = <int>` and `store.concurrent_albums = <int>` configurations. These options can dramatically reduce backup speed with good connections. In my case a full backup (~200GB) dropped from ~12h to ~90m using 10 downloaders and 10 analyzers!! (both options defaults to 1 to maintain old behaviour).
+- Add `store.force_video_download = <bool>` configuration to download videos marked as "Under process" in Smugmug. Sometimes those files will be permanently marked as such, so this option is the only way to backup them (or at least try to...)
+- Add new `-cfg <folder path>` command line argument to add a custom folder containing a `config.toml` configuration file
+- Print execution time to INFO log
 
 ## [v1.4.0](https://github.com/tommyblue/smugmug-backup/tree/v1.4.0) - 2023-08-06
 

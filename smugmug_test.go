@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -73,7 +75,7 @@ func TestRun(t *testing.T) {
 
 	dest_dir := t.TempDir()
 
-	var downloadCalled int
+	var downloadCalled atomic.Int32
 	tmpl, _ := buildFilenameTemplate("")
 	w := &Worker{
 		cfg: &Conf{
@@ -86,10 +88,17 @@ func TestRun(t *testing.T) {
 			albumImagesURI: albumImagesURI,
 		},
 		downloadFn: func(_, _ string, _ int64) (bool, error) {
-			downloadCalled++
+			downloadCalled.Add(1)
 			return true, nil
 		},
-		filenameTmpl: tmpl,
+		filenameTmpl:     tmpl,
+		downloadsCh:      make(chan *downloadInfo),
+		downloadsWorkers: 3,
+		downloadWg:       sync.WaitGroup{},
+		stopCh:           make(chan struct{}),
+		albumCh:          make(chan album),
+		albumsWorkers:    3,
+		albumWg:          sync.WaitGroup{},
 	}
 	w.Run()
 
@@ -98,8 +107,9 @@ func TestRun(t *testing.T) {
 		t.Fatalf("Dest folder %s not created", dst)
 	}
 
-	if downloadCalled != 2 {
-		t.Fatalf("download want %d, got %d", 2, downloadCalled)
+	called := downloadCalled.Load()
+	if called != 2 {
+		t.Fatalf("download want %d, got %d", 2, called)
 	}
 }
 
@@ -169,7 +179,7 @@ func TestReadConf(t *testing.T) {
 
 	defer setupConfFile(t, cfgObj, false)()
 
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
 	}
@@ -220,7 +230,7 @@ func TestReadConfOverrides(t *testing.T) {
 		os.Unsetenv("SMGMG_BK_USER_TOKEN")
 		os.Unsetenv("SMGMG_BK_USER_SECRET")
 	}()
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("unexpected err %v", err)
 	}
@@ -261,7 +271,7 @@ func TestReadConfMissingFileValues(t *testing.T) {
 	defer setupConfFile(t, cfgObj, true)()
 
 	// expected the conf to return an error
-	cfg, err := ReadConf()
+	cfg, err := ReadConf("")
 	if err != nil {
 		t.Fatalf("Unexpected err: %v", err)
 	}
@@ -277,7 +287,7 @@ func TestReadConfMissingFileValues(t *testing.T) {
 		os.Unsetenv("SMGMG_BK_USER_SECRET")
 	}()
 	// now it must work
-	cfg, err = ReadConf()
+	cfg, err = ReadConf("")
 	if err != nil {
 		t.Fatalf("Unexpected err: %v", err)
 	}

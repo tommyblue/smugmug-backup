@@ -59,6 +59,9 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 	uri := firstURI
 	var images []albumImage
 	for uri != "" {
+		if w.quitting {
+			return nil, nil
+		}
 		var a albumImagesResponse
 		if err := w.req.get(uri, &a); err != nil {
 			return images, fmt.Errorf("error getting album images from %s. Error: %v", uri, err)
@@ -96,14 +99,12 @@ func (w *Worker) imageTimestamp(img albumImage) time.Time {
 // saveImages calls saveImage or saveVideo to save a list of album images to the given folder
 func (w *Worker) saveImages(images []albumImage, folder string) {
 	for _, image := range images {
-		if image.IsVideo {
-			if err := w.saveVideo(image, folder); err != nil {
-				log.Warnf("Error: %v", err)
-			}
-			continue
+		if w.quitting {
+			return
 		}
-		if err := w.saveImage(image, folder); err != nil {
-			log.Warnf("Error: %v", err)
+		w.downloadsCh <- &downloadInfo{
+			image:  image,
+			folder: folder,
 		}
 	}
 }
@@ -128,14 +129,14 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 	return nil
 }
 
-// saveVideo saves a video to the given folder unless its name is empty od is still under processing
+// saveVideo saves a video to the given folder unless its name is empty or is still under processing
 func (w *Worker) saveVideo(image albumImage, folder string) error {
 	if image.Name() == "" {
 		return errors.New("unable to find valid video filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
-	if image.Processing { // Skip videos if under processing
+	if image.Processing && !w.cfg.ForceVideoDownload { // Skip videos if under processing
 		return fmt.Errorf("skipping video %s because under processing, %#v", image.Name(), image)
 	}
 
