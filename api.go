@@ -59,6 +59,9 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 	uri := firstURI
 	var images []albumImage
 	for uri != "" {
+		if w.quitting {
+			return nil, nil
+		}
 		var a albumImagesResponse
 		if err := w.req.get(uri, &a); err != nil {
 			return images, fmt.Errorf("error getting album images from %s. Error: %v", uri, err)
@@ -96,14 +99,12 @@ func (w *Worker) imageTimestamp(img albumImage) time.Time {
 // saveImages calls saveImage or saveVideo to save a list of album images to the given folder
 func (w *Worker) saveImages(images []albumImage, folder string) {
 	for _, image := range images {
-		if image.IsVideo {
-			if err := w.saveVideo(image, folder); err != nil {
-				log.Warnf("Error: %v", err)
-			}
-			continue
+		if w.quitting {
+			return
 		}
-		if err := w.saveImage(image, folder); err != nil {
-			log.Warnf("Error: %v", err)
+		w.downloadsCh <- &downloadInfo{
+			image:  image,
+			folder: folder,
 		}
 	}
 }

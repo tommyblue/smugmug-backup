@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/arl/statsviz"
@@ -61,9 +63,24 @@ func main() {
 		log.WithError(err).Fatal("Can't initialize the package")
 	}
 
-	if err := wrk.Run(); err != nil {
-		log.Fatal(err)
-	}
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	end := make(chan struct{})
+	go func() {
+		if err := wrk.Run(); err != nil {
+			log.Fatal(err)
+		}
+		end <- struct{}{}
+	}()
+
+	go func() {
+		<-sigs
+		log.Info("Stopping...")
+		wrk.Stop()
+	}()
+
+	<-end
 	duration := time.Since(start)
 	log.Infof("Backup completed in %s", duration)
 }
