@@ -141,11 +141,12 @@ type FileMetadata struct {
 
 // Worker actually implements the backup logic
 type Worker struct {
-	req          requestsHandler
-	cfg          *Conf
-	errors       int
-	downloadFn   func(string, string, int64) (bool, error) // defined in struct for better testing
-	filenameTmpl *template.Template
+	req              requestsHandler
+	cfg              *Conf
+	errors           int
+	downloadFn       func(string, string, int64) (bool, error) // defined in struct for better testing
+	filenameTmpl     *template.Template
+	csvLock          sync.Mutex
 }
 
 // New return a SmugMug backup configuration. It returns an error if it fails parsing

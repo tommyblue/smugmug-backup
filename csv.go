@@ -55,6 +55,9 @@ func (w *Worker) buildMetadata(a albumImage, folder string) []string {
 
 // writeToCSV writes images metadata to CSV file
 func (w *Worker) writeToCSV(images []albumImage, folder string) {
+	w.csvLock.Lock()
+	defer w.csvLock.Unlock()
+
 	file, err := os.OpenFile(w.cfg.metadataFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		log.Errorf("cannot open metadata CSV file: %v", err)
