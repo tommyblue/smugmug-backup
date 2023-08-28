@@ -128,14 +128,14 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 	return nil
 }
 
-// saveVideo saves a video to the given folder unless its name is empty od is still under processing
+// saveVideo saves a video to the given folder unless its name is empty or is still under processing
 func (w *Worker) saveVideo(image albumImage, folder string) error {
 	if image.Name() == "" {
 		return errors.New("unable to find valid video filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
-	if image.Processing { // Skip videos if under processing
+	if image.Processing && !w.cfg.ForceVideoDownload { // Skip videos if under processing
 		return fmt.Errorf("skipping video %s because under processing, %#v", image.Name(), image)
 	}
 

@@ -13,15 +13,16 @@ import (
 
 // Conf is the configuration of the smugmug worker
 type Conf struct {
-	ApiKey             string // API key
-	ApiSecret          string // API secret
-	UserToken          string // User token
-	UserSecret         string // User secret
-	Destination        string // Backup destination folder
-	Filenames          string // Template for files naming
-	UseMetadataTimes   bool   // When true, the last update timestamp will be retrieved from metadata
-	ForceMetadataTimes bool   // When true, then the last update timestamp is always retrieved and overwritten, also for existing files
-	WriteCSV           bool   // When true, a CSV file including downloaded files metadata is written
+	ApiKey              string // API key
+	ApiSecret           string // API secret
+	UserToken           string // User token
+	UserSecret          string // User secret
+	Destination         string // Backup destination folder
+	Filenames           string // Template for files naming
+	UseMetadataTimes    bool   // When true, the last update timestamp will be retrieved from metadata
+	ForceMetadataTimes  bool   // When true, then the last update timestamp is always retrieved and overwritten, also for existing files
+	WriteCSV            bool   // When true, a CSV file including downloaded files metadata is written
+	ForceVideoDownload  bool   // When true, download videos also if marked as under processing
 
 	username     string
 	metadataFile string
@@ -112,15 +113,16 @@ func ReadConf(cfgPath string) (*Conf, error) {
 	}
 
 	cfg := &Conf{
-		ApiKey:             viper.GetString("authentication.api_key"),
-		ApiSecret:          viper.GetString("authentication.api_secret"),
-		UserToken:          viper.GetString("authentication.user_token"),
-		UserSecret:         viper.GetString("authentication.user_secret"),
-		Destination:        viper.GetString("store.destination"),
-		Filenames:          viper.GetString("store.file_names"),
-		UseMetadataTimes:   viper.GetBool("store.use_metadata_times"),
-		ForceMetadataTimes: viper.GetBool("store.force_metadata_times"),
-		WriteCSV:           viper.GetBool("store.write_csv"),
+		ApiKey:              viper.GetString("authentication.api_key"),
+		ApiSecret:           viper.GetString("authentication.api_secret"),
+		UserToken:           viper.GetString("authentication.user_token"),
+		UserSecret:          viper.GetString("authentication.user_secret"),
+		Destination:         viper.GetString("store.destination"),
+		Filenames:           viper.GetString("store.file_names"),
+		UseMetadataTimes:    viper.GetBool("store.use_metadata_times"),
+		ForceMetadataTimes:  viper.GetBool("store.force_metadata_times"),
+		WriteCSV:            viper.GetBool("store.write_csv"),
+		ForceVideoDownload:  viper.GetBool("store.force_video_download"),
 	}
 
 	cfg.overrideEnvConf()

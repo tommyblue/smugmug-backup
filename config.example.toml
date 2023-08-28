@@ -10,3 +10,4 @@ file_names = "<Filename with template replacements>"
 use_metadata_times = true
 force_metadata_times = true
 write_csv = true
+force_video_download = true
