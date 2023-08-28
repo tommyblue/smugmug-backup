@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/arl/statsviz"
 	log "github.com/sirupsen/logrus"
@@ -45,6 +46,7 @@ func main() {
 			log.Println(http.ListenAndServe(statsAddr, nil))
 		}()
 	}
+	start := time.Now()
 
 	cfg, err := smugmug.ReadConf()
 	if err != nil {
@@ -59,4 +61,6 @@ func main() {
 	if err := wrk.Run(); err != nil {
 		log.Fatal(err)
 	}
+	duration := time.Since(start)
+	log.Infof("Backup completed in %s", duration)
 }
