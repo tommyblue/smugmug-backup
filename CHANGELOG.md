@@ -25,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Maintenance
 
+## [v1.5.1](https://github.com/tommyblue/smugmug-backup/tree/v1.5.1) - 2023-09-15
+
+### Fixed
+
+- Do not replace some HTML characters in file name and other values used in the `store.file_names` conf
 
 ## [v1.5.0](https://github.com/tommyblue/smugmug-backup/tree/v1.5.0) - 2023-08-28
 

@@ -1,8 +1,8 @@
 package smugmug
 
 import (
-	"html/template"
 	"testing"
+	"text/template"
 )
 
 func Test_albumImage_buildFilename(t *testing.T) {
@@ -32,6 +32,15 @@ func Test_albumImage_buildFilename(t *testing.T) {
 			fields:       f,
 			filenameConf: "{{.FileName}}",
 			want:         "FileNameValue",
+			wantErr:      false,
+		},
+		{
+			name: "with apostrophe",
+			fields: fields{
+				FileName: "FileName'Value",
+			},
+			filenameConf: "{{.FileName}}",
+			want:         "FileName'Value",
 			wantErr:      false,
 		},
 		{

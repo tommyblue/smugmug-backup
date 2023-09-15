@@ -3,10 +3,10 @@ package smugmug
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"os"
 	"path/filepath"
 	"sync"
+	"text/template"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

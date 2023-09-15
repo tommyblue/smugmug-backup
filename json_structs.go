@@ -3,7 +3,7 @@ package smugmug
 import (
 	"bytes"
 	"errors"
-	"html/template"
+	"text/template"
 	"time"
 )
 
