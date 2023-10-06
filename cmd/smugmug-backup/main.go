@@ -68,8 +68,9 @@ func main() {
 	app := gui.New()
 
 	end := make(chan struct{})
-	// quit := make(chan struct{})
 	go func() {
+		<-app.StartBtnTapped()
+
 		if err := wrk.Run(); err != nil {
 			log.Fatal(err)
 		}
@@ -83,7 +84,6 @@ func main() {
 			wrk.Stop()
 			<-end
 			app.Stop()
-			// quit <- struct{}{}
 		case <-app.Quit():
 			log.Info("Closed GUI, stopping...")
 			wrk.Stop()
@@ -95,7 +95,6 @@ func main() {
 
 	app.Run()
 
-	// <-quit
 	duration := time.Since(start)
 	log.Infof("Backup completed in %s", duration)
 }
