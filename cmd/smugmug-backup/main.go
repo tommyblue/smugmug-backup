@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,9 +24,13 @@ var flagVersion = flag.Bool("version", false, "print version number")
 var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
 var cfgPath = flag.String("cfg", "", "folder containing configuration file")
 
+type Writer interface {
+	Write(p []byte) (n int, err error)
+}
+
 func init() {
-	log.SetFormatter(&log.TextFormatter{})
-	log.SetOutput(os.Stdout)
+	log.SetFormatter(&gui.LogFormatter{})
+	log.SetOutput(io.MultiWriter(&gui.Logger{}, os.Stdout))
 
 	flag, isPresent := os.LookupEnv("DEBUG")
 	if isPresent && flag == "1" {
@@ -65,7 +70,7 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	app := gui.New()
+	app := gui.UI
 
 	end := make(chan struct{})
 	go func() {

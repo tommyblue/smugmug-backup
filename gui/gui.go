@@ -1,11 +1,10 @@
 package gui
 
 import (
-	"log"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -16,13 +15,17 @@ type GUI struct {
 	w       fyne.Window
 	stopCh  chan struct{}
 	startCh chan struct{}
+	logs    binding.StringList
 }
 
-func New() *GUI {
-	return &GUI{
+var UI *GUI
+
+func init() {
+	UI = &GUI{
 		app:     app.New(),
 		stopCh:  make(chan struct{}),
 		startCh: make(chan struct{}),
+		logs:    binding.NewStringList(),
 	}
 }
 
@@ -31,29 +34,39 @@ func (gui *GUI) Run() {
 	gui.w.Resize(fyne.NewSize(800, 600))
 
 	label := widget.NewLabel("Ready to backup?")
-	logging := widget.NewMultiLineEntry()
 
 	var startBtn *widget.Button
 	startFn := func() {
-		log.Println("starting backup...")
-		logging.SetText("Starting backup...")
+		gui.logs.Prepend("Starting backup...")
 		gui.startCh <- struct{}{}
 		if startBtn != nil {
 			startBtn.Disable()
 		}
 	}
-
 	startBtn = widget.NewButtonWithIcon("Start backup!", theme.DownloadIcon(), startFn)
 
-	topSection := container.New(layout.NewCenterLayout(), container.New(layout.NewGridLayout(1), label, startBtn))
-	bottomSection := container.NewScroll(logging)
-	mainLayout := layout.NewGridLayoutWithRows(2)
-	content := container.New(mainLayout, topSection, bottomSection)
+	topSection := gui.buildTopSection(label, startBtn)
+	bottomSection := container.NewScroll(widget.NewListWithData(gui.logs, func() fyne.CanvasObject {
+		return widget.NewLabel("template")
+	},
+		func(i binding.DataItem, o fyne.CanvasObject) {
+			o.(*widget.Label).Bind(i.(binding.String))
+		}))
+
+	content := container.New(layout.NewGridLayoutWithRows(2), topSection, bottomSection)
 	gui.w.SetContent(content)
 
 	gui.w.SetCloseIntercept(gui.closeIntercept)
 
 	gui.w.ShowAndRun()
+}
+
+func (gui *GUI) AddLog(line string) {
+	gui.logs.Prepend(line)
+}
+
+func (gui *GUI) buildTopSection(objs ...fyne.CanvasObject) fyne.CanvasObject {
+	return container.New(layout.NewCenterLayout(), container.New(layout.NewGridLayout(1), objs...))
 }
 
 func (gui *GUI) StartBtnTapped() <-chan struct{} {
