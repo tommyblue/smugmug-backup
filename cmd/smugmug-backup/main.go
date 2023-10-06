@@ -12,6 +12,7 @@ import (
 	"github.com/arl/statsviz"
 	log "github.com/sirupsen/logrus"
 	"github.com/tommyblue/smugmug-backup"
+	"github.com/tommyblue/smugmug-backup/gui"
 )
 
 var statsAddr = "localhost:6060"
@@ -64,7 +65,10 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	app := gui.New()
+
 	end := make(chan struct{})
+	// quit := make(chan struct{})
 	go func() {
 		if err := wrk.Run(); err != nil {
 			log.Fatal(err)
@@ -73,12 +77,25 @@ func main() {
 	}()
 
 	go func() {
-		<-sigs
-		log.Info("Stopping...")
-		wrk.Stop()
+		select {
+		case <-sigs:
+			log.Info("Stopping...")
+			wrk.Stop()
+			<-end
+			app.Stop()
+			// quit <- struct{}{}
+		case <-app.Quit():
+			log.Info("Closed GUI, stopping...")
+			wrk.Stop()
+			<-end
+			app.Stop()
+			// quit <- struct{}{}
+		}
 	}()
 
-	<-end
+	app.Run()
+
+	// <-quit
 	duration := time.Since(start)
 	log.Infof("Backup completed in %s", duration)
 }
