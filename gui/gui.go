@@ -5,6 +5,8 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -26,16 +28,28 @@ func New() *GUI {
 
 func (gui *GUI) Run() {
 	gui.w = gui.app.NewWindow("SmugMug Backup")
+	gui.w.Resize(fyne.NewSize(800, 600))
 
-	gui.w.SetContent(widget.NewLabel("Ready to backup?"))
+	label := widget.NewLabel("Ready to backup?")
+	logging := widget.NewMultiLineEntry()
 
-	startBtn := widget.NewButtonWithIcon("Start backup!", theme.DownloadIcon(), func() {
+	var startBtn *widget.Button
+	startFn := func() {
 		log.Println("starting backup...")
-		gui.w.SetContent(widget.NewLabel("Running..."))
+		logging.SetText("Starting backup...")
 		gui.startCh <- struct{}{}
-	})
+		if startBtn != nil {
+			startBtn.Disable()
+		}
+	}
 
-	gui.w.SetContent(startBtn)
+	startBtn = widget.NewButtonWithIcon("Start backup!", theme.DownloadIcon(), startFn)
+
+	topSection := container.New(layout.NewCenterLayout(), container.New(layout.NewGridLayout(1), label, startBtn))
+	bottomSection := container.NewScroll(logging)
+	mainLayout := layout.NewGridLayoutWithRows(2)
+	content := container.New(mainLayout, topSection, bottomSection)
+	gui.w.SetContent(content)
 
 	gui.w.SetCloseIntercept(gui.closeIntercept)
 
