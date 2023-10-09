@@ -91,7 +91,6 @@ func main() {
 			wrk.Stop()
 			<-end
 			app.Stop()
-			// quit <- struct{}{}
 		}
 	}()
 
