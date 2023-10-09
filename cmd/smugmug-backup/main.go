@@ -24,10 +24,6 @@ var flagVersion = flag.Bool("version", false, "print version number")
 var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
 var cfgPath = flag.String("cfg", "", "folder containing configuration file")
 
-type Writer interface {
-	Write(p []byte) (n int, err error)
-}
-
 func init() {
 	log.SetFormatter(&gui.LogFormatter{})
 	log.SetOutput(io.MultiWriter(&gui.Logger{}, os.Stdout))
