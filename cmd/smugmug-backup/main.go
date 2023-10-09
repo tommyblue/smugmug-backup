@@ -71,6 +71,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	app := gui.UI
+	app.AddInfo(gui.InfoVersionKey, version)
 
 	end := make(chan struct{})
 	go func() {

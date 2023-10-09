@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -16,7 +18,12 @@ type GUI struct {
 	stopCh  chan struct{}
 	startCh chan struct{}
 	logs    binding.StringList
+	info    map[string]string
 }
+
+const (
+	InfoVersionKey = "version"
+)
 
 var UI *GUI
 
@@ -26,7 +33,12 @@ func init() {
 		stopCh:  make(chan struct{}),
 		startCh: make(chan struct{}),
 		logs:    binding.NewStringList(),
+		info:    make(map[string]string),
 	}
+}
+
+func (gui *GUI) AddInfo(key, value string) {
+	gui.info[key] = value
 }
 
 func (gui *GUI) Run() {
@@ -44,16 +56,19 @@ func (gui *GUI) Run() {
 		}
 	}
 	startBtn = widget.NewButtonWithIcon("Start backup!", theme.DownloadIcon(), startFn)
+	top := container.New(layout.NewCenterLayout(), container.New(layout.NewGridLayout(1), label, startBtn))
 
-	topSection := gui.buildTopSection(label, startBtn)
-	bottomSection := container.NewScroll(widget.NewListWithData(gui.logs, func() fyne.CanvasObject {
+	main := widget.NewListWithData(gui.logs, func() fyne.CanvasObject {
 		return widget.NewLabel("template")
 	},
 		func(i binding.DataItem, o fyne.CanvasObject) {
 			o.(*widget.Label).Bind(i.(binding.String))
-		}))
+		})
 
-	content := container.New(layout.NewGridLayoutWithRows(2), topSection, bottomSection)
+	bottom := container.NewBorder(nil, nil, nil, widget.NewLabelWithStyle(fmt.Sprintf("Version: %s", gui.info[InfoVersionKey]), fyne.TextAlignTrailing, fyne.TextStyle{}))
+
+	content := container.NewBorder(top, bottom, nil, nil, main)
+
 	gui.w.SetContent(content)
 
 	gui.w.SetCloseIntercept(gui.closeIntercept)
@@ -63,10 +78,6 @@ func (gui *GUI) Run() {
 
 func (gui *GUI) AddLog(line string) {
 	gui.logs.Prepend(line)
-}
-
-func (gui *GUI) buildTopSection(objs ...fyne.CanvasObject) fyne.CanvasObject {
-	return container.New(layout.NewCenterLayout(), container.New(layout.NewGridLayout(1), objs...))
 }
 
 func (gui *GUI) StartBtnTapped() <-chan struct{} {
