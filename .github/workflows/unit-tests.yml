@@ -1,11 +1,11 @@
-name: Go
+name: Unit tests
 on: [push]
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.20
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 'stable'
@@ -25,6 +25,20 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
+      - name: Get dependencies
+        run: >-
+          sudo apt-get update &&
+          sudo apt-get install
+          bc
+          gcc
+          libgl1-mesa-dev
+          libwayland-dev
+          libx11-dev
+          libxkbcommon-dev
+          xorg-dev
+          xvfb
+        if: ${{ runner.os == 'Linux' }}
 
       - name: gofmt
         run: make gofmt
