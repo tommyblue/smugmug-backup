@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/arl/statsviz"
 	log "github.com/sirupsen/logrus"
 	"github.com/tommyblue/smugmug-backup"
+	"github.com/tommyblue/smugmug-backup/gui"
 )
 
 var statsAddr = "localhost:6060"
@@ -23,8 +25,8 @@ var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsA
 var cfgPath = flag.String("cfg", "", "folder containing configuration file")
 
 func init() {
-	log.SetFormatter(&log.TextFormatter{})
-	log.SetOutput(os.Stdout)
+	log.SetFormatter(&gui.LogFormatter{})
+	log.SetOutput(io.MultiWriter(&gui.Logger{}, os.Stdout))
 
 	flag, isPresent := os.LookupEnv("DEBUG")
 	if isPresent && flag == "1" {
@@ -64,8 +66,13 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	app := gui.UI
+	app.AddInfo(gui.InfoVersionKey, version)
+
 	end := make(chan struct{})
 	go func() {
+		<-app.StartBtnTapped()
+
 		if err := wrk.Run(); err != nil {
 			log.Fatal(err)
 		}
@@ -73,12 +80,22 @@ func main() {
 	}()
 
 	go func() {
-		<-sigs
-		log.Info("Stopping...")
-		wrk.Stop()
+		select {
+		case <-sigs:
+			log.Info("Stopping...")
+			wrk.Stop()
+			<-end
+			app.Stop()
+		case <-app.Quit():
+			log.Info("Closed GUI, stopping...")
+			wrk.Stop()
+			<-end
+			app.Stop()
+		}
 	}()
 
-	<-end
+	app.Run()
+
 	duration := time.Since(start)
 	log.Infof("Backup completed in %s", duration)
 }
