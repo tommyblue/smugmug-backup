@@ -67,6 +67,9 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	app := gui.UI
+	if app == nil {
+		log.Fatal("UI is nil")
+	}
 	app.AddInfo(gui.InfoVersionKey, version)
 
 	end := make(chan struct{})
@@ -77,6 +80,19 @@ func main() {
 			log.Fatal(err)
 		}
 		end <- struct{}{}
+	}()
+
+	go func() {
+		for range app.AnalyzeBtnTapped() {
+			info, err := wrk.Analyze()
+			if err != nil {
+				log.Fatal(err)
+			}
+			app.AddInfo(gui.AnalysisDoneKey, info.Analyzed)
+			app.AddInfo(gui.AnalysisAlbumsKey, info.Albums)
+			app.AddInfo(gui.AnalysisImagesKey, info.Images)
+
+		}
 	}()
 
 	go func() {

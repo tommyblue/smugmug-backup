@@ -347,6 +347,48 @@ func (w *Worker) Run() error {
 	return nil
 }
 
+type UserAccountInfo struct {
+	Analyzed bool
+	Albums   int
+	Images   int
+}
+
+// Analyze the user account to retrieve albums and photos numbers
+func (w *Worker) Analyze() (UserAccountInfo, error) {
+	info := UserAccountInfo{}
+
+	var err error
+	w.cfg.username, err = w.currentUser()
+	if err != nil {
+		return info, fmt.Errorf("error checking credentials: %v", err)
+	}
+
+	// Get user albums
+	log.Infof("Getting albums for user %s...\n", w.cfg.username)
+	albums, err := w.userAlbums()
+	if err != nil {
+		return info, fmt.Errorf("error getting user albums: %v", err)
+	}
+	info.Albums = len(albums)
+
+	for i, album := range albums {
+		if i > 2 {
+			break
+		}
+		images, err := w.albumImages(album.Uris.AlbumImages.URI, album.URLPath)
+		if err != nil {
+			log.WithError(err).Errorf("cannot get album images for %s", album.Uris.AlbumImages.URI)
+			continue
+		}
+		info.Images += len(images)
+	}
+
+	info.Analyzed = true
+	log.Infof("Analysis done: %+v\n", info)
+
+	return info, nil
+}
+
 func (w *Worker) Stop() {
 	log.Info("Quitting worker...")
 	close(w.stopCh)
