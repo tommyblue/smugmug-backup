@@ -49,6 +49,7 @@ jobs:
         run: |
             go install golang.org/x/vuln/cmd/govulncheck@latest
             govulncheck ./...
+            go mod tidy
 
       - name: Build
         run: make build

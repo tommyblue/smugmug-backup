@@ -18,3 +18,5 @@
 dist/
 /config.toml
 /backup
+/tmp/
+.idea

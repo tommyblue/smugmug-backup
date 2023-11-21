@@ -1,3 +1,5 @@
+import * as theme from "./theme.js";
+
 var infoIcon = {
     'width': 470,
     'height': 530,
@@ -6,6 +8,8 @@ var infoIcon = {
 
 const newConfigObject = (cfg) => {
     return {
+        // showEditInChartStudio: true,
+        // plotlyServerURL: "https://chart-studio.plotly.com",
         displaylogo: false,
         modeBarButtonsToRemove: ['2D', 'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'toggleSpikelines'],
         modeBarButtonsToAdd: [{
@@ -14,7 +18,7 @@ const newConfigObject = (cfg) => {
             icon: infoIcon,
             val: false,
             click: handleInfoButton,
-        }, ],
+        },],
         toImageButtonOptions: {
             format: 'png',
             filename: cfg.name,
@@ -39,11 +43,15 @@ const newLayoutObject = (cfg) => {
         margin: {
             t: 80,
         },
-        paper_bgcolor: '#f8f8f8',
-        plot_bgcolor: '#ffffdd',
+        paper_bgcolor: cfg.layout.paper_bgcolor,
+        plot_bgcolor: cfg.layout.plot_bgcolor,
+        font: {
+            color: cfg.layout.font_color
+        },
         width: 630,
         height: 450,
         hovermode: 'x',
+        barmode: cfg.layout.barmode,
         xaxis: {
             tickformat: '%H:%M:%S',
             type: "date",
@@ -56,12 +64,13 @@ const newLayoutObject = (cfg) => {
             ticktext: copyArrayOrNull(cfg.layout.yaxis.ticktext),
             tickvals: copyArrayOrNull(cfg.layout.yaxis.tickvals),
             title: cfg.layout.yaxis.title,
+            ticksuffix: cfg.layout.yaxis.ticksuffix,
             fixedrange: true,
         },
         showlegend: true,
         legend: {
             "orientation": "h"
-        },
+        }
     };
 
     if (layout.yaxis.tickmode == "array") {
@@ -94,6 +103,19 @@ const handleInfoButton = (gd, ev) => {
     button.setAttribute('data-val', !val);
 }
 
+const themeColors = {
+    light: {
+        paper_bgcolor: '#f8f8f8',
+        plot_bgcolor: '#ffffdd',
+        font_color: '#434343'
+    },
+    dark: {
+        paper_bgcolor: '#181a1c',
+        plot_bgcolor: '#282a2c',
+        font_color: '#fff'
+    }
+};
+
 /*
     Plot configuration object:
     {
@@ -101,11 +123,11 @@ const handleInfoButton = (gd, ev) => {
       "title": string,                 // plot title 
       "type": 'scatter'|'bar'|'heatmap' 
       "updateFreq": int,               // datapoints to receive before redrawing the plot. (default: 1)
+      "infoText": string,              // text showed in the plot 'info' tooltip
       "events": "lastgc",              // source of vertical lines (example: 'lastgc')
       "layout": object,                // (depends on plot type)
       "subplots": array,               // describe 'traces', only for 'scatter' or 'bar' plots
       "heatmap": object,               // heatmap details
-      "infoText": string,              // text showed in the plot 'info' tooltip
      }
 
     Layout for 'scatter' and 'bar' plots:
@@ -115,7 +137,8 @@ const handleInfoButton = (gd, ev) => {
                 "text": "bytes"      // yaxis title
             },
             "ticksuffix": "B",       // base unit for ticks
-        }
+        },
+        "barmode": "stack",           // 'stack' or 'group' (only for bar plots)
     },
 
     Layout" for heatmaps:
@@ -159,21 +182,16 @@ class Plot {
      */
 
     constructor(cfg) {
+        cfg.layout.paper_bgcolor = themeColors[theme.getThemeMode()].paper_bgcolor;
+        cfg.layout.plot_bgcolor = themeColors[theme.getThemeMode()].plot_bgcolor;
+        cfg.layout.font_color = themeColors[theme.getThemeMode()].font_color;
+
         this._cfg = cfg;
         this._updateCount = 0;
         this._dataTemplate = [];
+        this._lastData = [{ x: new Date() }];
 
-        if (['scatter', 'bar'].includes(this._cfg.type)) {
-            this._cfg.subplots.forEach(subplot => {
-                this._dataTemplate.push({
-                    type: this._cfg.type,
-                    x: null,
-                    y: null,
-                    name: subplot.name,
-                    hovertemplate: `<b>${subplot.unitfmt}</b>`,
-                })
-            });
-        } else if (this._cfg.type == 'heatmap') {
+        if (this._cfg.type == 'heatmap') {
             this._dataTemplate.push({
                 type: 'heatmap',
                 x: null,
@@ -182,6 +200,16 @@ class Plot {
                 showlegend: false,
                 colorscale: this._cfg.colorscale,
                 custom_data: this._cfg.custom_data,
+            });
+        } else {
+            this._cfg.subplots.forEach(subplot => {
+                this._dataTemplate.push({
+                    type: this._cfg.type,
+                    x: null,
+                    y: null,
+                    name: subplot.name,
+                    hovertemplate: `<b>${subplot.unitfmt}</b>`,
+                })
             });
         }
 
@@ -198,7 +226,7 @@ class Plot {
         this._plotIdx = idx;
         // Pass a single data with no data to create an empty plot, this removes
         // the 'bad time formatting' warning at startup.
-        Plotly.newPlot(this._htmlElt, [{ x: new Date() }], this._plotlyLayout, this._plotlyConfig);
+        Plotly.newPlot(this._htmlElt, this._lastData, this._plotlyLayout, this._plotlyConfig);
         if (this._cfg.type == 'heatmap') {
             this._installHeatmapTooltip();
         }
@@ -232,16 +260,16 @@ class Plot {
                 }
 
                 return `
-                    <div class="tooltip-table tooltip-style">
-                    <div class="tooltip-row">
-                    <div class="tooltip-label">${hover.yname}</div>
-                    <div class="tooltip-value">${bucket}</div>
-                    </div>
-                    <div class="tooltip-row">
-                    <div class="tooltip-label">${hover.zname}</div>
-                    <div class="tooltip-value">${d.z}</div>
-                    </div>
-                    </div> `;
+<div class="tooltip-table tooltip-style">
+    <div class="tooltip-row">
+        <div class="tooltip-label">${hover.yname}</div>
+        <div class="tooltip-value">${bucket}</div>
+    </div>
+    <div class="tooltip-row">
+        <div class="tooltip-label">${hover.zname}</div>
+        <div class="tooltip-value">${d.z}</div>
+    </div>
+</div> `;
             }
             instance.setContent(data.points.map(pt2txt)[0]);
             instance.show();
@@ -256,25 +284,27 @@ class Plot {
 
     _extractData(data) {
         const serie = data.series.get(this._cfg.name);
-        if (['scatter', 'bar'].includes(this._cfg.type)) {
+        if (this._cfg.type == 'heatmap') {
+            this._dataTemplate[0].x = data.times;
+            this._dataTemplate[0].z = serie;
+            this._dataTemplate[0].hoverinfo = 'none';
+        } else {
             for (let i = 0; i < this._dataTemplate.length; i++) {
                 this._dataTemplate[i].x = data.times;
                 this._dataTemplate[i].y = serie[i];
                 this._dataTemplate[i].stackgroup = this._cfg.subplots[i].stackgroup;
                 this._dataTemplate[i].hoveron = this._cfg.subplots[i].hoveron;
+                this._dataTemplate[i].type = this._cfg.subplots[i].type || this._cfg.type;
                 this._dataTemplate[i].marker = {
                     color: this._cfg.subplots[i].color,
                 };
             }
-        } else if (this._cfg.type == 'heatmap') {
-            this._dataTemplate[0].x = data.times;
-            this._dataTemplate[0].z = serie;
-            this._dataTemplate[0].hoverinfo = 'none';
         }
         return this._dataTemplate;
     }
 
     update(xrange, data, shapes) {
+        this._lastData = this._extractData(data);
         this._updateCount++;
         if (this._cfg.updateFreq == 0 || (this._updateCount % this._cfg.updateFreq == 0)) {
             // Update layout with vertical shapes if necessary.
@@ -285,8 +315,23 @@ class Plot {
             // Move the xaxis time range.
             this._plotlyLayout.xaxis.range = xrange;
 
-            Plotly.react(this._htmlElt, this._extractData(data), this._plotlyLayout, this._plotlyConfig);
+            Plotly.react(this._htmlElt, this._lastData, this._plotlyLayout, this._plotlyConfig);
         }
+    }
+
+    /**
+     * update theme color and immediately force plot redraw to apply the new theme
+     */
+    updateTheme() {
+        const themeMode = theme.getThemeMode();
+        this._cfg.layout.paper_bgcolor = themeColors[themeMode].paper_bgcolor;
+        this._cfg.layout.plot_bgcolor = themeColors[themeMode].plot_bgcolor;
+        this._cfg.layout.font_color = themeColors[themeMode].font_color;
+
+        this._plotlyLayout = newLayoutObject(this._cfg);
+        this._plotlyConfig = newConfigObject(this._cfg);
+
+        Plotly.react(this._htmlElt, this._lastData, this._plotlyLayout);
     }
 };
 
