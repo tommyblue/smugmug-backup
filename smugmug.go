@@ -26,6 +26,8 @@ type Conf struct {
 	ForceVideoDownload  bool   // When true, download videos also if marked as under processing
 	ConcurrentDownloads int    // number of concurrent downloads of images and videos, default is 1
 	ConcurrentAlbums    int    // number of concurrent albums analyzed via API calls
+	HTTPBaseUrl         string // Smugmug API URL, defaults to https://api.smugmug.com
+	HTTPMaxRetries      int    // Max number of retries for HTTP calls, defaults to 3
 
 	username     string
 	metadataFile string
@@ -101,6 +103,8 @@ func ReadConf(cfgPath string) (*Conf, error) {
 	viper.AddConfigPath(".")
 
 	// defaults
+	viper.SetDefault("http.base_url", "https://api.smugmug.com")
+	viper.SetDefault("http.max_retries", 3)
 	viper.SetDefault("store.file_names", "{{.FileName}}")
 	viper.SetDefault("store.concurrent_downloads", 1)
 	viper.SetDefault("store.concurrent_albums", 1)
@@ -130,6 +134,8 @@ func ReadConf(cfgPath string) (*Conf, error) {
 		ForceVideoDownload:  viper.GetBool("store.force_video_download"),
 		ConcurrentDownloads: viper.GetInt("store.concurrent_downloads"),
 		ConcurrentAlbums:    viper.GetInt("store.concurrent_albums"),
+		HTTPBaseUrl:         viper.GetString("http.base_url"),
+		HTTPMaxRetries:      viper.GetInt("http.max_retries"),
 	}
 
 	cfg.overrideEnvConf()
@@ -178,7 +184,7 @@ func New(cfg *Conf) (*Worker, error) {
 		return nil, err
 	}
 
-	handler := newHTTPHandler(cfg.ApiKey, cfg.ApiSecret, cfg.UserToken, cfg.UserSecret)
+	handler := newHTTPHandler(cfg.HTTPBaseUrl, cfg.HTTPMaxRetries, cfg.ApiKey, cfg.ApiSecret, cfg.UserToken, cfg.UserSecret)
 
 	tmpl, err := buildFilenameTemplate(cfg.Filenames)
 	if err != nil {

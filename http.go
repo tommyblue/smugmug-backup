@@ -12,22 +12,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// maxRetries defines the number of http calls retries (in case of errors) before giving up
-const maxRetries = 3
-const baseAPIURL = "https://api.smugmug.com"
-
 type header struct {
 	name  string
 	value string
 }
 
 type handler struct {
-	oauth *oauthConf
+	baseUrl    string
+	maxRetries int
+	oauth      *oauthConf
 }
 
-func newHTTPHandler(apiKey, apiSecret, userToken, userSecret string) *handler {
+func newHTTPHandler(baseUrl string, maxRetries int, apiKey, apiSecret, userToken, userSecret string) *handler {
 	return &handler{
-		oauth: newOauthConf(apiKey, apiSecret, userToken, userSecret),
+		baseUrl:    baseUrl,
+		maxRetries: maxRetries,
+		oauth:      newOauthConf(apiKey, apiSecret, userToken, userSecret),
 	}
 }
 
@@ -36,7 +36,7 @@ func (s *handler) get(url string, obj interface{}) error {
 	if url == "" {
 		return errors.New("can't get empty url")
 	}
-	return s.getJSON(fmt.Sprintf("%s%s", baseAPIURL, url), obj)
+	return s.getJSON(fmt.Sprintf("%s%s", s.baseUrl, url), obj)
 }
 
 // download the resource (image or video) from the given url to the given destination, checking
@@ -76,7 +76,7 @@ func (s *handler) download(dest, downloadURL string, fileSize int64) (bool, erro
 // getJSON makes a http calls to the given url, trying to decode the JSON response on the given obj
 func (s *handler) getJSON(url string, obj interface{}) error {
 	var result interface{}
-	for i := 1; i <= maxRetries; i++ {
+	for i := 1; i <= s.maxRetries; i++ {
 		log.Debug("Calling ", url)
 		resp, err := s.makeAPICall(url)
 		if err != nil {
@@ -86,7 +86,7 @@ func (s *handler) getJSON(url string, obj interface{}) error {
 		defer resp.Body.Close()
 		if err != nil {
 			log.Errorf("%s: reading response. %s", url, err)
-			if i >= maxRetries {
+			if i >= s.maxRetries {
 				return err
 			}
 		} else {
@@ -103,7 +103,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 
 	var resp *http.Response
 	var errorsList []error
-	for i := 1; i <= maxRetries; i++ {
+	for i := 1; i <= s.maxRetries; i++ {
 		req, _ := http.NewRequest("GET", url, nil)
 
 		// Auth header must be generate every time (nonce must change)
@@ -122,7 +122,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 		if err != nil {
 			log.Debugf("#%d %s: %s\n", i, url, err)
 			errorsList = append(errorsList, err)
-			if i >= maxRetries {
+			if i >= s.maxRetries {
 				for _, e := range errorsList {
 					log.Error(e)
 				}
@@ -135,7 +135,7 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 
 		if r.StatusCode >= 400 {
 			errorsList = append(errorsList, errors.New(r.Status))
-			if i >= maxRetries {
+			if i >= s.maxRetries {
 				for _, e := range errorsList {
 					log.Error(e)
 				}

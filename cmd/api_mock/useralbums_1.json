@@ -1,0 +1,18 @@
+{
+  "Response": {
+    "Uri": "/api/v2/user/myUser!albums",
+    "Album": [
+      {
+        "UrlPath": "/MyAlbum/2024/01",
+        "Uris": {
+          "AlbumImages": {
+            "Uri": "/api/v2/album/aX3TYu!images"
+          }
+        }
+      }
+    ],
+    "Pages": {
+      "NextPage": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "Response": {
+    "Uri": "/api/v2/album/aX3TYu!images",
+    "AlbumImage": [
+      {
+
+        "ArchivedMD5": "258597waaf35aed642z08c351426b5e4",
+        "ArchivedSize": 476277,
+        "ArchivedUri": "http://localhost:3000/photos/photo.jpg",
+        "Caption": "",
+        "DateTimeUploaded": "2024-01-05T20:04:39+00:00",
+        "FileName": "somePhoto.jpg",
+        "ImageKey": "iTsf4K3",
+        "IsVideo": false,
+        "Keywords": "",
+        "Processing": false,
+        "UploadKey": "11112222333",
+        "Uris": {
+          "ImageMetadata": {
+            "Uri": "/api/v2/image/iTsf4K3-0!metadata"
+          }
+        }
+      }
+    ],
+    "Pages": {
+      "NextPage": ""
+    }
+  }
+}

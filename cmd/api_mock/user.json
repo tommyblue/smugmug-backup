@@ -1,0 +1,15 @@
+{
+  "Response": {
+    "User": {
+      "Uris": {
+        "UserAlbums": {
+          "Uri": "/api/v2/user/myUser!albums",
+          "Locator": "Album",
+          "LocatorType": "Objects",
+          "UriDescription": "All of user's albums",
+          "EndpointType": "UserAlbums"
+        }
+      }
+    }
+  }
+}

@@ -21,6 +21,7 @@ var version = "-- unknown --"
 var flagVersion = flag.Bool("version", false, "print version number")
 var flagStats = flag.Bool("stats", false, fmt.Sprintf("show stats at %s", statsAddr))
 var cfgPath = flag.String("cfg", "", "folder containing configuration file")
+var mockServer = flag.Bool("mock", false, "use the included mock server (must be running on localhost:3000)")
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{})
@@ -54,6 +55,10 @@ func main() {
 	cfg, err := smugmug.ReadConf(*cfgPath)
 	if err != nil {
 		log.WithError(err).Fatal("Configuration error")
+	}
+
+	if *mockServer {
+		cfg.HTTPBaseUrl = "http://localhost:3000"
 	}
 
 	wrk, err := smugmug.New(cfg)

@@ -75,6 +75,7 @@ type albumImage struct {
 	UploadKey        string `json:"UploadKey"`
 	DateTimeOriginal string `json:"DateTimeOriginal"`
 	Caption          string `json:"Caption"`
+	DateTimeUploaded string `json:"DateTimeUploaded"`
 	Keywords         string `json:"Keywords"`
 	Latitude         string `json:"Latitude"`
 	Longitude        string `json:"Longitude"`

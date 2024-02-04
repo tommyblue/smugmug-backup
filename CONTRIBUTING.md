@@ -26,3 +26,9 @@ Contributing is more than welcome :smile:
 I'm dropping here the link to
 [package documentation](https://pkg.go.dev/github.com/tommyblue/smugmug-backup?tab=doc), in
 case you need that.
+
+### Mocking the API server
+
+This package contains a mock server that can be executed with `go run ./cmd/api_mock` so that you
+don't need to have a real SmugMug account. The server will listen on http://127.0.0.1:3000  
+To use it run the smugmug-backup binary with the `-mock` flag.
