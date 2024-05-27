@@ -1,0 +1,13 @@
+{
+	"endOfLine": "auto",
+	"trailingComma": "es5",
+	"tabWidth": 2,
+	"useTabs": true,
+	"bracketSpacing": true,
+	"arrowParens": "avoid",
+	"semi": false,
+	"printWidth": 120,
+	"importOrder": ["^[^@|.]", "^@", "^[^.]", "^[.]"],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true
+}
