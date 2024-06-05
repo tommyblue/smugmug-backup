@@ -7,6 +7,27 @@ if (require("electron-squirrel-startup")) {
 
 let mainWindow: BrowserWindow | null
 
+let serverProc = require("child_process").spawn("./server")
+serverProc.stdout.on("data", data => {
+	console.log(`stdout: ${data}`)
+})
+
+serverProc.stderr.on("data", data => {
+	console.error(`stderr: ${data}`)
+})
+
+serverProc.on("close", code => {
+	console.log(`child process exited with code ${code}`)
+})
+// serverProc.on("exit", (code, sig) => {
+// 	// finishing
+// 	console.log("serverProc exit", code, sig)
+// })
+// serverProc.on("error", error => {
+// 	// error handling
+// 	console.log("serverProc error", error)
+// })
+
 const createWindow = () => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
@@ -40,6 +61,10 @@ app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
 		app.quit()
 	}
+})
+
+app.on("will-quit", () => {
+	serverProc.kill()
 })
 
 app.on("activate", () => {
