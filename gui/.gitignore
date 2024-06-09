@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Ignore server binary
+/server

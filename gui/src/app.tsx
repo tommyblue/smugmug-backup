@@ -1,7 +1,14 @@
+import React from "react"
 import { createRoot } from "react-dom/client"
 import Button from "./components/Button"
 
 const App = () => {
+	React.useEffect(() => {
+		setInterval(() => {
+			window.health.check()
+		}, 5000)
+	}, [])
+
 	const selectFile = async () => {
 		const filePaths = await window.electronAPI.openFile()
 		console.log(filePaths)

@@ -1,4 +1,7 @@
+import grpc from "@grpc/grpc-js"
+import protoLoader from "@grpc/proto-loader"
 import { app, BrowserWindow, dialog, ipcMain } from "electron"
+
 import path from "path"
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -6,17 +9,22 @@ if (require("electron-squirrel-startup")) {
 }
 
 let mainWindow: BrowserWindow | null
+let serverAddr = "localhost:8089"
 
 let serverProc = require("child_process").spawn("./server")
-serverProc.stdout.on("data", data => {
-	console.log(`stdout: ${data}`)
+serverProc.stdout.on("data", (data: any) => {
+	const jsonData = JSON.parse(data)
+	if (jsonData.listen) {
+		console.log(`Server listening on ${jsonData.listen}`)
+		serverAddr = jsonData.listen
+	}
 })
 
-serverProc.stderr.on("data", data => {
+serverProc.stderr.on("data", (data: any) => {
 	console.error(`stderr: ${data}`)
 })
 
-serverProc.on("close", code => {
+serverProc.on("close", (code: any) => {
 	console.log(`child process exited with code ${code}`)
 })
 // serverProc.on("exit", (code, sig) => {
@@ -82,4 +90,29 @@ ipcMain.handle("dialog:openFile", async event => {
 		properties: ["openFile"],
 	})
 	return result.filePaths
+})
+
+ipcMain.handle("health:check", async event => {
+	// TODO: use better way to load proto file
+	const PROTO_PATH = path.join(__dirname, "../../src/proto/health.proto")
+	const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+		keepCase: true,
+		longs: String,
+		enums: String,
+		defaults: true,
+		oneofs: true,
+	})
+
+	const healthProto = grpc.loadPackageDefinition(packageDefinition).grpc.health.v1
+	// TODO: get the server address from the renderer
+	const client = new healthProto.Health(serverAddr, grpc.credentials.createInsecure())
+	client.Check({ service: "" }, (err, response) => {
+		if (err) {
+			console.error("Errore nel controllo dello stato:", err)
+			response = "unknown"
+		} else {
+			console.log("Stato del server gRPC:", response.status)
+			response = response.status
+		}
+	})
 })
