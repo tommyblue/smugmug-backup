@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require("electron")
 
 contextBridge.exposeInMainWorld("electronAPI", {
 	openFile: () => ipcRenderer.invoke("dialog:openFile"),
+	readFile: async (path: string) => ipcRenderer.invoke("dialog:readFile", path),
 })
 
 contextBridge.exposeInMainWorld("health", {

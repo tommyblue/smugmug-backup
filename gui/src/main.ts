@@ -1,6 +1,7 @@
 import grpc from "@grpc/grpc-js"
 import protoLoader from "@grpc/proto-loader"
 import { app, BrowserWindow, dialog, ipcMain } from "electron"
+import fs from "fs"
 
 import path from "path"
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -39,8 +40,8 @@ serverProc.on("close", (code: any) => {
 const createWindow = () => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 800,
-		height: 600,
+		width: 1600,
+		height: 1000,
 		webPreferences: {
 			preload: path.join(__dirname, "preload.js"),
 		},
@@ -90,6 +91,10 @@ ipcMain.handle("dialog:openFile", async event => {
 		properties: ["openFile"],
 	})
 	return result.filePaths
+})
+
+ipcMain.handle("dialog:readFile", async (event, filePath) => {
+	return fs.readFileSync(filePath, "utf-8")
 })
 
 ipcMain.handle("health:check", async event => {
