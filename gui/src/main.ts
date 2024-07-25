@@ -2,8 +2,8 @@ import grpc from "@grpc/grpc-js"
 import protoLoader from "@grpc/proto-loader"
 import { app, BrowserWindow, dialog, ipcMain } from "electron"
 import fs from "fs"
-
 import path from "path"
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
 	app.quit()
