@@ -3,6 +3,7 @@ import protoLoader from "@grpc/proto-loader"
 import { app, BrowserWindow, dialog, ipcMain } from "electron"
 import fs from "fs"
 import path from "path"
+import { HealthProtobufTypeDefinition } from "./grpc"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -108,16 +109,16 @@ ipcMain.handle("health:check", async event => {
 		oneofs: true,
 	})
 
-	const healthProto = grpc.loadPackageDefinition(packageDefinition).grpc.health.v1
+	const health = grpc.loadPackageDefinition(packageDefinition) as HealthProtobufTypeDefinition
 	// TODO: get the server address from the renderer
-	const client = new healthProto.Health(serverAddr, grpc.credentials.createInsecure())
+	const client = new health.grpc.health.v1.Health(serverAddr, grpc.credentials.createInsecure())
 	client.Check({ service: "" }, (err, response) => {
 		if (err) {
 			console.error("Errore nel controllo dello stato:", err)
-			response = "unknown"
+			// response = "unknown"
 		} else {
 			console.log("Stato del server gRPC:", response.status)
-			response = response.status
+			// response = response.status
 		}
 	})
 })
