@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 
+-
 
 ### Changed
 
@@ -24,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 
 ### Maintenance
+
+-
+
+## [v1.5.5](https://github.com/tommyblue/smugmug-backup/tree/v1.5.5) - 2024-08-27
+
+### Fixed
+
+- skip videos that failed processing. They cannot be downloaded even from the website
+
+### Maintenance
+
+- Go v1.23
+- Dependencies updates
 
 ## [v1.5.1](https://github.com/tommyblue/smugmug-backup/tree/v1.5.1) - 2023-09-15
 
@@ -53,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update goreleaser
 
 ## Fixed
+
 - fix exception when album is empty [#39]
 
 ## [v1.3.1](https://github.com/tommyblue/smugmug-backup/tree/v1.3.1) - 2023-05-03
