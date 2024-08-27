@@ -79,6 +79,8 @@ type albumImage struct {
 	Keywords         string `json:"Keywords"`
 	Latitude         string `json:"Latitude"`
 	Longitude        string `json:"Longitude"`
+	Status           string `json:"Status"`
+	SubStatus        string `json:"SubStatus"`
 	Uris             struct {
 		ImageMetadata struct {
 			Uri string `json:"Uri"`

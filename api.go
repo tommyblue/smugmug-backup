@@ -136,8 +136,13 @@ func (w *Worker) saveVideo(image albumImage, folder string) error {
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
 
-	if image.Processing && !w.cfg.ForceVideoDownload { // Skip videos if under processing
-		return fmt.Errorf("skipping video %s because under processing, %#v", image.Name(), image)
+	if image.Processing {
+		if image.Status == "Preprocess" && image.SubStatus == "CanNotProcess" {
+			return fmt.Errorf("skipping video %s because cannot be processed, %#v", image.Name(), image)
+		}
+		if !w.cfg.ForceVideoDownload { // Skip videos if under processing
+			return fmt.Errorf("skipping video %s because under processing, %#v", image.Name(), image)
+		}
 	}
 
 	var v albumVideo
