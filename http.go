@@ -115,7 +115,8 @@ func (s *handler) makeAPICall(url string) (*http.Response, error) {
 			{name: "Accept", value: "application/json"},
 			{name: "Authorization", value: h},
 		}
-		log.Debug(headers)
+		// Disable headers to avoid leaking sensitive information
+		// log.Debug(headers)
 		addHeaders(req, headers)
 
 		r, err := client.Do(req)

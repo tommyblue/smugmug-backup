@@ -77,6 +77,27 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 		// Loop over response in inject the albumPath and then append to the images
 		for _, i := range a.Response.AlbumImage {
 			i.AlbumPath = albumPath
+			log.Debugf("Component => `%s`", i.Uris.Components.Uri)
+			if w.cfg.DownloadRaw && i.Uris.Components.Uri != "" {
+				var c imageComponent
+				if err := w.req.get(i.Uris.Components.Uri, &c); err != nil {
+					log.Errorf("error getting image components from %s. Error: %v", i.Uris.Components.Uri, err)
+					continue
+				}
+
+				for _, comp := range c.Response.Component {
+					if comp.ComponentType == componentTypeRaw {
+						log.Debugf("Found raw image for %s: %s", i.FileName, comp.DownloadUrl)
+						i.ArchivedUri = comp.DownloadUrl
+						i.ArchivedSize = comp.FileSize
+						i.FileName = comp.FileName
+						i.ArchivedMD5 = comp.MD5
+						break
+
+					}
+				}
+			}
+
 			if err := i.buildFilename(w.filenameTmpl); err != nil {
 				return nil, fmt.Errorf("cannot build image filename: %v", err)
 			}
