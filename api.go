@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -115,6 +116,7 @@ func (w *Worker) saveImage(image albumImage, folder string) error {
 		return errors.New("unable to find valid image filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
+	dest = strings.Replace(dest, "?", "_", -1)
 	log.Debug(image.ArchivedUri)
 
 	ok, err := w.downloadFn(dest, image.ArchivedUri, image.ArchivedSize)
@@ -135,6 +137,7 @@ func (w *Worker) saveVideo(image albumImage, folder string) error {
 		return errors.New("unable to find valid video filename, skipping")
 	}
 	dest := fmt.Sprintf("%s/%s", folder, image.Name())
+	dest = strings.Replace(dest, "?", "_", -1)
 
 	if image.Processing {
 		if image.Status == "Preprocess" && image.SubStatus == "CanNotProcess" {
