@@ -26,6 +26,7 @@ type Conf struct {
 	ForceVideoDownload  bool   // When true, download videos also if marked as under processing
 	ConcurrentDownloads int    // number of concurrent downloads of images and videos, default is 1
 	ConcurrentAlbums    int    // number of concurrent albums analyzed via API calls
+	DownloadRaw         bool   // download raw files if available
 	HTTPBaseUrl         string // Smugmug API URL, defaults to https://api.smugmug.com
 	HTTPMaxRetries      int    // Max number of retries for HTTP calls, defaults to 3
 
@@ -134,6 +135,7 @@ func ReadConf(cfgPath string) (*Conf, error) {
 		ForceVideoDownload:  viper.GetBool("store.force_video_download"),
 		ConcurrentDownloads: viper.GetInt("store.concurrent_downloads"),
 		ConcurrentAlbums:    viper.GetInt("store.concurrent_albums"),
+		DownloadRaw:         viper.GetBool("store.download_raw"),
 		HTTPBaseUrl:         viper.GetString("http.base_url"),
 		HTTPMaxRetries:      viper.GetInt("http.max_retries"),
 	}
@@ -241,7 +243,6 @@ func (w *Worker) albumWorker(id int) {
 			}
 
 			log.Debugf("Got album images for %s", album.Uris.AlbumImages.URI)
-			// log.Debugf("%+v", images)
 			w.saveImages(images, folder)
 			if w.cfg.WriteCSV {
 				w.writeToCSV(images, folder)

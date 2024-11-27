@@ -63,6 +63,7 @@ func TestGetAlbumImages(t *testing.T) {
 	w := &Worker{
 		req:          &albumImages{},
 		filenameTmpl: tmpl,
+		cfg:          &Conf{},
 	}
 	albums, err := w.albumImages("someurl", "myAlbumPath")
 	if err != nil {

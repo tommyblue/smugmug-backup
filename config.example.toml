@@ -13,3 +13,4 @@ write_csv = true
 force_video_download = true
 concurrent_albums = 5
 concurrent_downloads = 10
+download_raw = false

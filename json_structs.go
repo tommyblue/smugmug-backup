@@ -88,6 +88,9 @@ type albumImage struct {
 		LargestVideo struct {
 			Uri string `json:"Uri"`
 		} `json:"LargestVideo"`
+		Components struct {
+			Uri string `json:"Uri"`
+		} `json:"Components"`
 	} `json:"Uris"`
 
 	builtFilename string // The final filename, after template replacements
@@ -131,5 +134,19 @@ type albumVideo struct {
 			Size int64  `json:"Size"`
 			Url  string `json:"Url"`
 		} `json:"LargestVideo"`
+	} `json:"Response"`
+}
+
+const componentTypeRaw = "svi"
+
+type imageComponent struct {
+	Response struct {
+		Component []struct {
+			ComponentType string `json:"ComponentType"`
+			DownloadUrl   string `json:"DownloadUrl"`
+			FileName      string `json:"FileName"`
+			FileSize      int64  `json:"FileSize"`
+			MD5           string `json:"MD5"`
+		} `json:"Component"`
 	} `json:"Response"`
 }
