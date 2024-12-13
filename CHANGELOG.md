@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `FileNameNoExt`, `Extension`, `Date` and `Time` support in `store.file_names`
+-
 
 ### Changed
 
@@ -26,6 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Maintenance
 
 -
+
+## [v1.6.0](https://github.com/tommyblue/smugmug-backup/tree/v1.6.0) - 2024-12-13
+
+### Added
+
+- Add `FileNameNoExt`, `Extension`, `Date` and `Time` support in `store.file_names`
 
 ## [v1.5.5](https://github.com/tommyblue/smugmug-backup/tree/v1.5.5) - 2024-08-27
 
