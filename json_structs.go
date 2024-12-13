@@ -3,6 +3,8 @@ package smugmug
 import (
 	"bytes"
 	"errors"
+	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -95,10 +97,20 @@ type albumImage struct {
 
 func (a *albumImage) buildFilename(tmpl *template.Template) error {
 	replacementVars := map[string]string{
-		"FileName":    a.FileName,
-		"ImageKey":    a.ImageKey,
-		"ArchivedMD5": a.ArchivedMD5,
-		"UploadKey":   a.UploadKey,
+		"FileName":      a.FileName,
+		"ImageKey":      a.ImageKey,
+		"ArchivedMD5":   a.ArchivedMD5,
+		"UploadKey":     a.UploadKey,
+		"Date":          "",
+		"Time":          "",
+		"Extension":     filepath.Ext(a.FileName),
+		"FileNameNoExt": strings.TrimSuffix(filepath.Base(a.FileName), filepath.Ext(a.FileName)),
+	}
+
+	tm, err := time.Parse(time.RFC3339, a.DateTimeOriginal)
+	if err == nil {
+		replacementVars["Date"] = tm.Format(time.DateOnly)
+		replacementVars["Time"] = strings.Replace(tm.Format(time.TimeOnly), ":", "_", -1)
 	}
 
 	var builtFilename bytes.Buffer
