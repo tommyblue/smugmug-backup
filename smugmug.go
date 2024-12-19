@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"text/template"
 
@@ -28,6 +29,7 @@ type Conf struct {
 	ConcurrentAlbums    int    // number of concurrent albums analyzed via API calls
 	HTTPBaseUrl         string // Smugmug API URL, defaults to https://api.smugmug.com
 	HTTPMaxRetries      int    // Max number of retries for HTTP calls, defaults to 3
+	AlbumFilter         string // Only download albums matching the filter (currently just HasPrefx:)
 
 	username     string
 	metadataFile string
@@ -58,6 +60,10 @@ func (cfg *Conf) overrideEnvConf() {
 
 	if os.Getenv("SMGMG_BK_FILE_NAMES") != "" {
 		cfg.Filenames = os.Getenv("SMGMG_BK_FILE_NAMES")
+	}
+
+	if os.Getenv("SMGMG_BK_ALBUM_FILTER") != "" {
+		cfg.AlbumFilter = os.Getenv("SMGMG_BK_ALBUM_FILTER")
 	}
 }
 
@@ -134,6 +140,7 @@ func ReadConf(cfgPath string) (*Conf, error) {
 		ForceVideoDownload:  viper.GetBool("store.force_video_download"),
 		ConcurrentDownloads: viper.GetInt("store.concurrent_downloads"),
 		ConcurrentAlbums:    viper.GetInt("store.concurrent_albums"),
+		AlbumFilter:         viper.GetString("store.album_filter"),
 		HTTPBaseUrl:         viper.GetString("http.base_url"),
 		HTTPMaxRetries:      viper.GetInt("http.max_retries"),
 	}
@@ -224,6 +231,13 @@ func (w *Worker) albumWorker(id int) {
 				log.Debugf("Quitting albumWorker %d", id)
 				return
 			}
+
+			filter := w.cfg.AlbumFilter
+			if len(filter) > 0 && !strings.HasPrefix(strings.ToLower(album.URLPath), strings.ToLower(filter)) { // Improve: use a real 'mathces' function instead of just HasPrefix
+				log.Infof("Ignoring album: %s", album.URLPath)
+				continue
+			}
+
 			folder := filepath.Join(w.cfg.Destination, album.URLPath)
 
 			if err := createFolder(folder); err != nil {
