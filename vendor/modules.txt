@@ -6,8 +6,8 @@ github.com/arl/statsviz/internal/static
 # github.com/fsnotify/fsnotify v1.7.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
-# github.com/go-chi/chi/v5 v5.1.0
-## explicit; go 1.14
+# github.com/go-chi/chi/v5 v5.2.2
+## explicit; go 1.20
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
 # github.com/gorilla/websocket v1.5.3
