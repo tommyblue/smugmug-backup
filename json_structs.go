@@ -88,7 +88,7 @@ func (a album) HighlightImageKey() string {
 		return ""
 	}
 	imageKeyWithVersion := parts[len(parts)-1]
-	
+
 	// Split by "-" and get the first part (imageKey without version)
 	hyphenIndex := strings.LastIndex(imageKeyWithVersion, "-")
 	if hyphenIndex == -1 {

@@ -187,6 +187,7 @@ func (w *Worker) setChTime(image albumImage, dest string) error {
 
 	return nil
 }
+
 // highlightImageKey returns the ImageKey of the highlight image for an album by querying the highlight node
 func (w *Worker) highlightImageKey(nodeId string) string {
 	if nodeId == "" {
@@ -200,7 +201,7 @@ func (w *Worker) highlightImageKey(nodeId string) string {
 	}
 
 	// Try to extract ImageKey from various possible response structures
-	
+
 	// Format 1: Direct Image.ImageKey
 	if resp.Response.Image.ImageKey != "" {
 		log.Debugf("Found highlight ImageKey via Image.ImageKey: %s", resp.Response.Image.ImageKey)
@@ -249,7 +250,7 @@ func extractImageKeyFromURI(imageURI string) string {
 		return ""
 	}
 	imageKeyWithVersion := parts[len(parts)-1]
-	
+
 	// Split by "-" and get the first part (imageKey without version)
 	hyphenIndex := strings.LastIndex(imageKeyWithVersion, "-")
 	if hyphenIndex == -1 {

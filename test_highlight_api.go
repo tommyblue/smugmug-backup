@@ -20,7 +20,7 @@ func TestHighlightNodeStructure(t *testing.T) {
 
 	for _, nodeId := range nodeIds {
 		url := fmt.Sprintf("https://api.smugmug.com/api/v2/highlight/node/%s", nodeId)
-		
+
 		resp, err := http.Get(url)
 		if err != nil {
 			t.Logf("Error calling %s: %v", url, err)
@@ -44,7 +44,7 @@ func TestHighlightNodeStructure(t *testing.T) {
 			t.Logf("Error parsing JSON: %v", err)
 			continue
 		}
-		
+
 		// Pretty print
 		prettyJson, _ := json.MarshalIndent(generic, "", "  ")
 		t.Logf("Pretty JSON:\n%s", string(prettyJson))
@@ -55,7 +55,7 @@ func TestHighlightNodeStructure(t *testing.T) {
 // based on SmugMug API patterns
 func TestHighlightNodeResponseStructures(t *testing.T) {
 	// Based on SmugMug API patterns, highlight nodes might contain:
-	
+
 	// Possibility 1: Direct image reference
 	type possibility1 struct {
 		Response struct {

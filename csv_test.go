@@ -134,13 +134,13 @@ func Test_writeImagesToCSV(t *testing.T) {
 
 	// Verify structure
 	reader := csv.NewReader(f)
-	
+
 	// Read header
 	header, err := reader.Read()
 	if err != nil {
 		t.Fatalf("cannot read header: %v", err)
 	}
-	
+
 	// Find IsHighlight column
 	isHighlightIdx := -1
 	imageKeyIdx := -1
@@ -152,7 +152,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 			imageKeyIdx = i
 		}
 	}
-	
+
 	if isHighlightIdx == -1 {
 		t.Fatalf("IsHighlight column not found in header")
 	}
@@ -163,7 +163,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 	// Read and verify rows
 	rowCount := 0
 	highlightImageKey := ""
-	
+
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -172,7 +172,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error reading row: %v", err)
 		}
-		
+
 		rowCount++
 		// Record the image key that has IsHighlight=true
 		if record[isHighlightIdx] == "true" {
@@ -183,7 +183,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 	if rowCount != 3 {
 		t.Fatalf("want 3 data rows, got %d", rowCount)
 	}
-	
+
 	// Verify that image1 is marked as highlight
 	if highlightImageKey != "image1" {
 		t.Fatalf("expected image1 to be highlight, got %s", highlightImageKey)
