@@ -88,6 +88,48 @@ you can perform the account backup with:
 Running the backup can take a lot of time, depending on the size of your account and the
 connection speed. Check the command line logs to see what's going on.
 
+## CSV Metadata Export
+
+When `store.write_csv = true` is enabled, two CSV files are created in the backup destination:
+
+### albums_metadata.csv
+Contains complete album information with 20 fields including:
+- `AlbumKey` (unique identifier)
+- Title, Description, Keywords
+- Privacy, SecurityType, ImageCount
+- Dates (Date, LastUpdated, ImagesLastUpdated)
+- WebUri, HighlightImageUri
+
+### images_metadata.csv
+Contains complete image/video information with 31 fields including:
+- `AlbumKey` (links to albums_metadata)
+- Filename, Title, Caption, Keywords
+- Format, Width, Height, Size
+- GPS coordinates (Latitude, Longitude, Altitude)
+- Dates (DateTimeOriginal, DateTimeUploaded)
+
+### Correlating Data
+The two CSV files can be joined using the `AlbumKey` field:
+
+```python
+# Example in Python with pandas
+import pandas as pd
+
+albums = pd.read_csv('albums_metadata.csv')
+images = pd.read_csv('images_metadata.csv')
+
+# Join images with their album information
+full_data = images.merge(albums, on='AlbumKey', how='left')
+```
+
+Or using SQL-like queries:
+```sql
+SELECT * FROM images_metadata 
+JOIN albums_metadata ON images_metadata.AlbumKey = albums_metadata.AlbumKey
+```
+
+This structure provides complete data portability for migration from SmugMug.
+
 ## Credentials
 
 SmugMug requires _OAuth1 authentication_. OAuth1 requires 4 values: an API key and secret that

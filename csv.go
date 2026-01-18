@@ -122,7 +122,7 @@ func (w *Worker) buildAlbumMetadata(a album) []string {
 		strconv.FormatBool(a.AllowDownloads),
 		a.PasswordHint,
 		strconv.FormatBool(a.Protected),
-		a.HighlightImageUri,
+		a.HighlightImageUri(),
 	}
 }
 

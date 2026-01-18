@@ -59,7 +59,6 @@ type album struct {
 	AllowDownloads     bool   `json:"AllowDownloads"`
 	PasswordHint       string `json:"PasswordHint"`
 	Protected          bool   `json:"Protected"`
-	HighlightImageUri  string `json:"HighlightImageUri"`
 	Uris               struct {
 		AlbumImages struct {
 			URI string `json:"Uri"`
@@ -68,6 +67,11 @@ type album struct {
 			URI string `json:"Uri"`
 		} `json:"HighlightImage"`
 	} `json:"Uris"`
+}
+
+// HighlightImageUri returns the URI of the highlight image for this album
+func (a album) HighlightImageUri() string {
+	return a.Uris.HighlightImage.URI
 }
 
 type albumImagesResponse struct {
