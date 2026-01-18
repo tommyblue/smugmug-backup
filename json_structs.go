@@ -40,16 +40,33 @@ type albumsResponse struct {
 }
 
 type album struct {
-	URLPath     string `json:"UrlPath"`
-	Title       string `json:"Title"`
-	Description string `json:"Description"`
-	Keywords    string `json:"Keywords"`
-	Date        string `json:"Date"`
-	LastUpdated string `json:"LastUpdated"`
-	Uris        struct {
+	URLPath            string `json:"UrlPath"`
+	AlbumKey           string `json:"AlbumKey"`
+	Title              string `json:"Title"`
+	Name               string `json:"Name"`
+	NiceName           string `json:"NiceName"`
+	Description        string `json:"Description"`
+	Keywords           string `json:"Keywords"`
+	Date               string `json:"Date"`
+	LastUpdated        string `json:"LastUpdated"`
+	ImagesLastUpdated  string `json:"ImagesLastUpdated"`
+	ImageCount         int    `json:"ImageCount"`
+	Privacy            string `json:"Privacy"`
+	SecurityType       string `json:"SecurityType"`
+	SortMethod         string `json:"SortMethod"`
+	SortDirection      string `json:"SortDirection"`
+	WebUri             string `json:"WebUri"`
+	AllowDownloads     bool   `json:"AllowDownloads"`
+	PasswordHint       string `json:"PasswordHint"`
+	Protected          bool   `json:"Protected"`
+	HighlightImageUri  string `json:"HighlightImageUri"`
+	Uris               struct {
 		AlbumImages struct {
 			URI string `json:"Uri"`
 		} `json:"AlbumImages"`
+		HighlightImage struct {
+			URI string `json:"Uri"`
+		} `json:"HighlightImage"`
 	} `json:"Uris"`
 }
 
@@ -72,7 +89,9 @@ type imageMetadataResponse struct {
 
 type albumImage struct {
 	AlbumPath        string // From album.URLPath
+	AlbumKey         string // From album.AlbumKey
 	FileName         string `json:"FileName"`
+	Title            string `json:"Title"`
 	ImageKey         string `json:"ImageKey"` // Use as unique ID if FileName is empty
 	ArchivedMD5      string `json:"ArchivedMD5"`
 	ArchivedSize     int64  `json:"ArchivedSize"`
@@ -86,13 +105,26 @@ type albumImage struct {
 	Keywords         string `json:"Keywords"`
 	Latitude         string `json:"Latitude"`
 	Longitude        string `json:"Longitude"`
+	Altitude         string `json:"Altitude"`
+	Format           string `json:"Format"`
+	Width            int    `json:"Width"`
+	Height           int    `json:"Height"`
+	OriginalWidth    int    `json:"OriginalWidth"`
+	OriginalHeight   int    `json:"OriginalHeight"`
+	Size             int64  `json:"Size"`
+	Hidden           bool   `json:"Hidden"`
+	Watermarked      bool   `json:"Watermarked"`
+	Collectable      bool   `json:"Collectable"`
+	IsArchive        bool   `json:"IsArchive"`
 	Status           string `json:"Status"`
 	SubStatus        string `json:"SubStatus"`
-	AlbumTitle       string `json:"AlbumTitle"`
-	AlbumDescription string `json:"AlbumDescription"`
-	AlbumKeywords    string `json:"AlbumKeywords"`
-	AlbumCreated     string `json:"AlbumCreated"`
-	AlbumLastUpdated string `json:"AlbumLastUpdated"`
+	WebUri           string `json:"WebUri"`
+	ThumbnailUrl     string `json:"ThumbnailUrl"`
+	AlbumTitle       string // From album
+	AlbumDescription string // From album
+	AlbumKeywords    string // From album
+	AlbumCreated     string // From album
+	AlbumLastUpdated string // From album
 	Uris             struct {
 		ImageMetadata struct {
 			Uri string `json:"Uri"`

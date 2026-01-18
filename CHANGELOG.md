@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Extended CSV metadata export with new fields: `AlbumTitle`, `AlbumDescription`, `AlbumKeywords`, `AlbumCreated`, `AlbumLastUpdated`, `DateTimeOriginal`, and `DateTimeUploaded`. The `metadata.csv` file now contains 14 fields instead of 7, providing comprehensive backup metadata information.
+- Extended CSV metadata export with comprehensive data export in two separate files:
+  - `albums_metadata.csv`: Complete album information including AlbumKey, Title, Description, Keywords, Privacy, SecurityType, ImageCount, dates, WebUri, and more (20 fields)
+  - `images_metadata.csv`: Complete image/video information including filename, title, caption, format, dimensions, GPS coordinates, dates, and all technical metadata (31 fields)
+- Added extensive fields to album and albumImage structures to capture all available SmugMug API data
+- This provides a complete data export for users migrating away from SmugMug
 
 ### Changed
 

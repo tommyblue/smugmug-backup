@@ -29,8 +29,9 @@ type Conf struct {
 	HTTPBaseUrl         string // Smugmug API URL, defaults to https://api.smugmug.com
 	HTTPMaxRetries      int    // Max number of retries for HTTP calls, defaults to 3
 
-	username     string
-	metadataFile string
+	username            string
+	albumsMetadataFile  string
+	imagesMetadataFile  string
 }
 
 // overrideEnvConf overrides any configuration value if the
@@ -192,8 +193,10 @@ func New(cfg *Conf) (*Worker, error) {
 	}
 
 	if cfg.WriteCSV {
-		cfg.metadataFile = filepath.Join(cfg.Destination, METADATA_FNAME)
-		createMetadataCSV(cfg.metadataFile)
+		cfg.albumsMetadataFile = filepath.Join(cfg.Destination, ALBUMS_METADATA_FNAME)
+		cfg.imagesMetadataFile = filepath.Join(cfg.Destination, IMAGES_METADATA_FNAME)
+		createAlbumsMetadataCSV(cfg.albumsMetadataFile)
+		createImagesMetadataCSV(cfg.imagesMetadataFile)
 	}
 
 	return &Worker{
@@ -244,7 +247,8 @@ func (w *Worker) albumWorker(id int) {
 			// log.Debugf("%+v", images)
 			w.saveImages(images, folder)
 			if w.cfg.WriteCSV {
-				w.writeToCSV(images, folder)
+				w.writeAlbumToCSV(album)
+				w.writeImagesToCSV(images, folder)
 			}
 		}
 	}

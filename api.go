@@ -77,6 +77,7 @@ func (w *Worker) albumImages(firstURI string, alb album) ([]albumImage, error) {
 		// Loop over response in inject the albumPath and album metadata, then append to the images
 		for _, i := range a.Response.AlbumImage {
 			i.AlbumPath = alb.URLPath
+			i.AlbumKey = alb.AlbumKey
 			i.AlbumTitle = alb.Title
 			i.AlbumDescription = alb.Description
 			i.AlbumKeywords = alb.Keywords
