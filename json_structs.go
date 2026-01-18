@@ -105,7 +105,7 @@ type albumImage struct {
 	Keywords         string `json:"Keywords"`
 	Latitude         string `json:"Latitude"`
 	Longitude        string `json:"Longitude"`
-	Altitude         string `json:"Altitude"`
+	Altitude         int    `json:"Altitude"`
 	Format           string `json:"Format"`
 	Width            int    `json:"Width"`
 	Height           int    `json:"Height"`

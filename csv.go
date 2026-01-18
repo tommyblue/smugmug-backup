@@ -155,7 +155,7 @@ func (w *Worker) buildImageMetadata(a albumImage, folder string) []string {
 		a.DateTimeUploaded,
 		a.Latitude,
 		a.Longitude,
-		a.Altitude,
+		strconv.Itoa(a.Altitude),
 		strconv.FormatBool(a.Hidden),
 		strconv.FormatBool(a.Watermarked),
 		strconv.FormatBool(a.Collectable),
