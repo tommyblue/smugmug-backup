@@ -76,13 +76,18 @@ type albumImage struct {
 	Processing       bool   `json:"Processing"`
 	UploadKey        string `json:"UploadKey"`
 	DateTimeOriginal string `json:"DateTimeOriginal"`
-	Caption          string `json:"Caption"`
 	DateTimeUploaded string `json:"DateTimeUploaded"`
+	Caption          string `json:"Caption"`
 	Keywords         string `json:"Keywords"`
 	Latitude         string `json:"Latitude"`
 	Longitude        string `json:"Longitude"`
 	Status           string `json:"Status"`
 	SubStatus        string `json:"SubStatus"`
+	AlbumTitle       string `json:"AlbumTitle"`
+	AlbumDescription string `json:"AlbumDescription"`
+	AlbumKeywords    string `json:"AlbumKeywords"`
+	AlbumCreated     string `json:"AlbumCreated"`
+	AlbumLastUpdated string `json:"AlbumLastUpdated"`
 	Uris             struct {
 		ImageMetadata struct {
 			Uri string `json:"Uri"`

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--
+- Extended CSV metadata export with new fields: `AlbumTitle`, `AlbumDescription`, `AlbumKeywords`, `AlbumCreated`, `AlbumLastUpdated`, `DateTimeOriginal`, and `DateTimeUploaded`. The `metadata.csv` file now contains 14 fields instead of 7, providing comprehensive backup metadata information.
 
 ### Changed
 

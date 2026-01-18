@@ -19,6 +19,13 @@ var csvHeader = []string{
 	"Keywords",
 	"Latitude",
 	"Longitude",
+	"AlbumTitle",
+	"AlbumDescription",
+	"AlbumKeywords",
+	"AlbumCreated",
+	"AlbumLastUpdated",
+	"DateTimeOriginal",
+	"DateTimeUploaded",
 }
 
 // createMetadataCSV creates the metadata CSV file and writes the header line
@@ -50,6 +57,13 @@ func (w *Worker) buildMetadata(a albumImage, folder string) []string {
 		a.Keywords,
 		a.Latitude,
 		a.Longitude,
+		a.AlbumTitle,
+		a.AlbumDescription,
+		a.AlbumKeywords,
+		a.AlbumCreated,
+		a.AlbumLastUpdated,
+		a.DateTimeOriginal,
+		a.DateTimeUploaded,
 	}
 }
 
