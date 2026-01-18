@@ -233,7 +233,7 @@ func (w *Worker) albumWorker(id int) {
 			}
 
 			log.Debugf("[ALBUM IMAGES] %s", album.Uris.AlbumImages.URI)
-			images, err := w.albumImages(album.Uris.AlbumImages.URI, album.URLPath)
+			images, err := w.albumImages(album.Uris.AlbumImages.URI, album)
 			if err != nil {
 				log.WithError(err).Errorf("cannot get album images for %s", album.Uris.AlbumImages.URI)
 				w.errors++

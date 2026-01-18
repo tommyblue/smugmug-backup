@@ -64,7 +64,15 @@ func TestGetAlbumImages(t *testing.T) {
 		req:          &albumImages{},
 		filenameTmpl: tmpl,
 	}
-	albums, err := w.albumImages("someurl", "myAlbumPath")
+	testAlbum := album{
+		URLPath:     "myAlbumPath",
+		Title:       "Test Album",
+		Description: "Test Description",
+		Keywords:    "test,keywords",
+		Date:        "2024-01-01",
+		LastUpdated: "2024-01-02",
+	}
+	albums, err := w.albumImages("someurl", testAlbum)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}

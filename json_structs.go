@@ -40,8 +40,13 @@ type albumsResponse struct {
 }
 
 type album struct {
-	URLPath string `json:"UrlPath"`
-	Uris    struct {
+	URLPath     string `json:"UrlPath"`
+	Title       string `json:"Title"`
+	Description string `json:"Description"`
+	Keywords    string `json:"Keywords"`
+	Date        string `json:"Date"`
+	LastUpdated string `json:"LastUpdated"`
+	Uris        struct {
 		AlbumImages struct {
 			URI string `json:"Uri"`
 		} `json:"AlbumImages"`

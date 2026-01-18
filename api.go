@@ -55,7 +55,7 @@ func (w *Worker) albums(firstURI string) ([]album, error) {
 
 // albumImages make multiple calls to obtain all images of an album. It calls the album images
 // endpoint unless the "NextPage" value in the response is empty
-func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, error) {
+func (w *Worker) albumImages(firstURI string, alb album) ([]albumImage, error) {
 	uri := firstURI
 	var images []albumImage
 	for uri != "" {
@@ -69,14 +69,19 @@ func (w *Worker) albumImages(firstURI string, albumPath string) ([]albumImage, e
 
 		// If the album is empty, a.Response.AlbumImage is missing instead of an empty array (weird...)
 		if a.Response.AlbumImage == nil {
-			log.Infof("album is empty: %s", albumPath)
+			log.Infof("album is empty: %s", alb.URLPath)
 
 			break
 		}
 
-		// Loop over response in inject the albumPath and then append to the images
+		// Loop over response in inject the albumPath and album metadata, then append to the images
 		for _, i := range a.Response.AlbumImage {
-			i.AlbumPath = albumPath
+			i.AlbumPath = alb.URLPath
+			i.AlbumTitle = alb.Title
+			i.AlbumDescription = alb.Description
+			i.AlbumKeywords = alb.Keywords
+			i.AlbumCreated = alb.Date
+			i.AlbumLastUpdated = alb.LastUpdated
 			if err := i.buildFilename(w.filenameTmpl); err != nil {
 				return nil, fmt.Errorf("cannot build image filename: %v", err)
 			}
