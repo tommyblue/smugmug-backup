@@ -29,9 +29,9 @@ type Conf struct {
 	HTTPBaseUrl         string // Smugmug API URL, defaults to https://api.smugmug.com
 	HTTPMaxRetries      int    // Max number of retries for HTTP calls, defaults to 3
 
-	username            string
-	albumsMetadataFile  string
-	imagesMetadataFile  string
+	username           string
+	albumsMetadataFile string
+	imagesMetadataFile string
 }
 
 // overrideEnvConf overrides any configuration value if the

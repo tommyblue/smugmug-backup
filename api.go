@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -185,4 +186,74 @@ func (w *Worker) setChTime(image albumImage, dest string) error {
 	}
 
 	return nil
+}
+// highlightImageKey returns the ImageKey of the highlight image for an album by querying the highlight node
+func (w *Worker) highlightImageKey(nodeId string) string {
+	if nodeId == "" {
+		return ""
+	}
+	uri := fmt.Sprintf("/api/v2/highlight/node/%s", nodeId)
+	var resp highlightNodeResponse
+	if err := w.req.get(uri, &resp); err != nil {
+		log.Debugf("error getting highlight image for node %s: %v", nodeId, err)
+		return ""
+	}
+
+	// Try to extract ImageKey from various possible response structures
+	
+	// Format 1: Direct Image.ImageKey
+	if resp.Response.Image.ImageKey != "" {
+		log.Debugf("Found highlight ImageKey via Image.ImageKey: %s", resp.Response.Image.ImageKey)
+		return resp.Response.Image.ImageKey
+	}
+
+	// Format 2: Direct HighlightImage.ImageKey
+	if resp.Response.HighlightImage.ImageKey != "" {
+		log.Debugf("Found highlight ImageKey via HighlightImage.ImageKey: %s", resp.Response.HighlightImage.ImageKey)
+		return resp.Response.HighlightImage.ImageKey
+	}
+
+	// Format 3: Extract from Uris.Image.URI (format: /api/v2/image/{ImageKey}-{version})
+	if resp.Response.Uris.Image.URI != "" {
+		return extractImageKeyFromURI(resp.Response.Uris.Image.URI)
+	}
+
+	// Format 4: Extract from Uris.AlbumImage.URI
+	if resp.Response.Uris.AlbumImage.URI != "" {
+		return extractImageKeyFromURI(resp.Response.Uris.AlbumImage.URI)
+	}
+
+	// Format 5: Extract from Image.URI
+	if resp.Response.Image.URI != "" {
+		return extractImageKeyFromURI(resp.Response.Image.URI)
+	}
+
+	// Format 6: Extract from HighlightImage.URI
+	if resp.Response.HighlightImage.URI != "" {
+		return extractImageKeyFromURI(resp.Response.HighlightImage.URI)
+	}
+
+	log.Debugf("Could not extract ImageKey from highlight node %s", nodeId)
+	return ""
+}
+
+// extractImageKeyFromURI extracts the ImageKey from a SmugMug image URI
+// URI format: /api/v2/image/{ImageKey}-{version} or /api/v2/albumimage/{AlbumKey}/{ImageKey}-{version}
+func extractImageKeyFromURI(imageURI string) string {
+	if imageURI == "" {
+		return ""
+	}
+	// Split by "/" and get the last part (imageKey-version)
+	parts := strings.Split(imageURI, "/")
+	if len(parts) == 0 {
+		return ""
+	}
+	imageKeyWithVersion := parts[len(parts)-1]
+	
+	// Split by "-" and get the first part (imageKey without version)
+	hyphenIndex := strings.LastIndex(imageKeyWithVersion, "-")
+	if hyphenIndex == -1 {
+		return imageKeyWithVersion
+	}
+	return imageKeyWithVersion[:hyphenIndex]
 }

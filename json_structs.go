@@ -3,7 +3,6 @@ package smugmug
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -41,26 +40,26 @@ type albumsResponse struct {
 }
 
 type album struct {
-	URLPath            string `json:"UrlPath"`
-	AlbumKey           string `json:"AlbumKey"`
-	Title              string `json:"Title"`
-	Name               string `json:"Name"`
-	NiceName           string `json:"NiceName"`
-	Description        string `json:"Description"`
-	Keywords           string `json:"Keywords"`
-	Date               string `json:"Date"`
-	LastUpdated        string `json:"LastUpdated"`
-	ImagesLastUpdated  string `json:"ImagesLastUpdated"`
-	ImageCount         int    `json:"ImageCount"`
-	Privacy            string `json:"Privacy"`
-	SecurityType       string `json:"SecurityType"`
-	SortMethod         string `json:"SortMethod"`
-	SortDirection      string `json:"SortDirection"`
-	WebUri             string `json:"WebUri"`
-	AllowDownloads     bool   `json:"AllowDownloads"`
-	PasswordHint       string `json:"PasswordHint"`
-	Protected          bool   `json:"Protected"`
-	Uris               struct {
+	URLPath           string `json:"UrlPath"`
+	AlbumKey          string `json:"AlbumKey"`
+	Title             string `json:"Title"`
+	Name              string `json:"Name"`
+	NiceName          string `json:"NiceName"`
+	Description       string `json:"Description"`
+	Keywords          string `json:"Keywords"`
+	Date              string `json:"Date"`
+	LastUpdated       string `json:"LastUpdated"`
+	ImagesLastUpdated string `json:"ImagesLastUpdated"`
+	ImageCount        int    `json:"ImageCount"`
+	Privacy           string `json:"Privacy"`
+	SecurityType      string `json:"SecurityType"`
+	SortMethod        string `json:"SortMethod"`
+	SortDirection     string `json:"SortDirection"`
+	WebUri            string `json:"WebUri"`
+	AllowDownloads    bool   `json:"AllowDownloads"`
+	PasswordHint      string `json:"PasswordHint"`
+	Protected         bool   `json:"Protected"`
+	Uris              struct {
 		AlbumImages struct {
 			URI string `json:"Uri"`
 		} `json:"AlbumImages"`
@@ -82,19 +81,35 @@ func (a album) HighlightImageKey() string {
 	if uri == "" {
 		return ""
 	}
-	// Extract ImageKey from URI like /api/v2/image/abc123-0!details
-	var imageKey string
-	_, err := fmt.Sscanf(uri, "/api/v2/image/%s", &imageKey)
-	if err != nil {
+	// Extract ImageKey from URI like /api/v2/image/abc123-0
+	// Split by "/" and get the last part (imageKey-version)
+	parts := strings.Split(uri, "/")
+	if len(parts) == 0 {
 		return ""
 	}
-	// Remove the version suffix (e.g., "-0" or "-1")
-	for i := len(imageKey) - 1; i >= 0; i-- {
-		if imageKey[i] == '-' {
-			return imageKey[:i]
-		}
+	imageKeyWithVersion := parts[len(parts)-1]
+	
+	// Split by "-" and get the first part (imageKey without version)
+	hyphenIndex := strings.LastIndex(imageKeyWithVersion, "-")
+	if hyphenIndex == -1 {
+		return imageKeyWithVersion
 	}
-	return imageKey
+	return imageKeyWithVersion[:hyphenIndex]
+}
+
+// HighlightNodeId extracts the node ID from the highlight image URI
+// URI format: /api/v2/highlight/node/{NodeId}
+func (a album) HighlightNodeId() string {
+	uri := a.Uris.HighlightImage.URI
+	if uri == "" {
+		return ""
+	}
+	// Extract NodeId from URI like /api/v2/highlight/node/abc123
+	parts := strings.Split(uri, "/")
+	if len(parts) == 0 {
+		return ""
+	}
+	return parts[len(parts)-1]
 }
 
 type albumImagesResponse struct {
@@ -204,6 +219,30 @@ func (a *albumImage) Name() string {
 	}
 
 	return a.ImageKey
+}
+
+type highlightNodeResponse struct {
+	Response struct {
+		// Try multiple possible response formats from SmugMug highlight node endpoint
+		Uris struct {
+			Image struct {
+				URI string `json:"Uri"`
+			} `json:"Image"`
+			AlbumImage struct {
+				URI string `json:"Uri"`
+			} `json:"AlbumImage"`
+		} `json:"Uris"`
+		// Alternative: direct image reference
+		Image struct {
+			ImageKey string `json:"ImageKey"`
+			URI      string `json:"Uri"`
+		} `json:"Image"`
+		// Alternative: HighlightImage reference
+		HighlightImage struct {
+			ImageKey string `json:"ImageKey"`
+			URI      string `json:"Uri"`
+		} `json:"HighlightImage"`
+	} `json:"Response"`
 }
 
 type albumVideo struct {

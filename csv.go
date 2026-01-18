@@ -130,14 +130,11 @@ func (w *Worker) buildAlbumMetadata(a album) []string {
 }
 
 // buildImageMetadata returns the data to be added to the images metadata CSV file
-func (w *Worker) buildImageMetadata(a albumImage, alb album, folder string) []string {
+func (w *Worker) buildImageMetadata(a albumImage, alb album, folder string, isHighlight bool) []string {
 	ftype := "image"
 	if a.IsVideo {
 		ftype = "video"
 	}
-	
-	// Check if this image is the album highlight
-	isHighlight := a.ImageKey == alb.HighlightImageKey()
 
 	return []string{
 		fmt.Sprintf("%s/%s", folder, a.Name()),
@@ -201,6 +198,8 @@ func (w *Worker) writeAlbumToCSV(alb album) {
 }
 
 // writeImagesToCSV writes images metadata to CSV file
+// It gets the highlight image key by calling the API for the highlight node
+// If the API call fails, no image will be marked as highlight (IsHighlight=false for all)
 func (w *Worker) writeImagesToCSV(images []albumImage, alb album, folder string) {
 	w.csvLock.Lock()
 	defer w.csvLock.Unlock()
@@ -220,8 +219,27 @@ func (w *Worker) writeImagesToCSV(images []albumImage, alb album, folder string)
 		}
 	}()
 
+	// Get the highlight image key for this album by calling the API
+	// The HighlightNodeId() returns the node ID (e.g., "fpT33v")
+	// We try to call the API to get the actual ImageKey
+	nodeId := alb.HighlightNodeId()
+	var highlightImageKey string
+	if nodeId != "" {
+		// Attempt to get highlight ImageKey from SmugMug API
+		// If this fails (API returns empty or wrong structure), no image will be marked
+		highlightImageKey = w.highlightImageKey(nodeId)
+		if highlightImageKey != "" {
+			log.Debugf("Found highlight ImageKey for album %s: %s", alb.AlbumKey, highlightImageKey)
+		} else {
+			log.Debugf("Could not determine highlight ImageKey for album %s (node %s), no image will be marked as highlight", alb.AlbumKey, nodeId)
+		}
+	}
+
 	for _, img := range images {
-		if err := writer.Write(w.buildImageMetadata(img, alb, folder)); err != nil {
+		// Mark image as highlight only if we successfully retrieved the highlight ImageKey from API
+		// and it matches this image
+		isHighlight := highlightImageKey != "" && img.ImageKey == highlightImageKey
+		if err := writer.Write(w.buildImageMetadata(img, alb, folder, isHighlight)); err != nil {
 			log.Errorf("cannot write to images metadata CSV file: %v", err)
 		}
 	}

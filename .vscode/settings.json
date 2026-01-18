@@ -1,0 +1,9 @@
+{
+  "terminal.integrated.defaultProfile.osx": "iTerm",
+  "terminal.integrated.profiles.osx": {
+    "iTerm": {
+      "path": "/bin/zsh",
+      "args": []
+    }
+  }
+}
