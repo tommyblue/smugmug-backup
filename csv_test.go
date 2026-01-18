@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-func Test_createMetadataCSV(t *testing.T) {
-	fpath := filepath.Join(t.TempDir(), "file.csv")
-	if err := createMetadataCSV(fpath); err != nil {
+func Test_createAlbumsMetadataCSV(t *testing.T) {
+	fpath := filepath.Join(t.TempDir(), "albums.csv")
+	if err := createAlbumsMetadataCSV(fpath); err != nil {
 		t.Fatalf("cannot create csv file: %v", err)
 	}
 
@@ -29,15 +29,36 @@ func Test_createMetadataCSV(t *testing.T) {
 	}
 }
 
-func Test_writeToCSV(t *testing.T) {
-	fpath := filepath.Join(t.TempDir(), "file.csv")
-	if err := createMetadataCSV(fpath); err != nil {
+func Test_createImagesMetadataCSV(t *testing.T) {
+	fpath := filepath.Join(t.TempDir(), "images.csv")
+	if err := createImagesMetadataCSV(fpath); err != nil {
+		t.Fatalf("cannot create csv file: %v", err)
+	}
+
+	f, err := os.Open(fpath)
+	if err != nil {
+		t.Fatalf("cannot open csv file: %v", err)
+	}
+
+	n, err := lineCounter(t, f)
+	if err != nil {
+		t.Fatalf("cannot count lines in csv file: %v", err)
+	}
+
+	if n != 1 {
+		t.Fatalf("want 1 line, got %d", n)
+	}
+}
+
+func Test_writeImagesToCSV(t *testing.T) {
+	fpath := filepath.Join(t.TempDir(), "images.csv")
+	if err := createImagesMetadataCSV(fpath); err != nil {
 		t.Fatalf("cannot create csv file: %v", err)
 	}
 
 	w := &Worker{
 		cfg: &Conf{
-			metadataFile: fpath,
+			imagesMetadataFile: fpath,
 		},
 	}
 
@@ -49,6 +70,7 @@ func Test_writeToCSV(t *testing.T) {
 			Keywords:      "a,b,c",
 			Latitude:      "40.123",
 			Longitude:     "11.11",
+			AlbumKey:      "album1",
 		},
 		{
 			builtFilename: "fname2",
@@ -57,6 +79,7 @@ func Test_writeToCSV(t *testing.T) {
 			Keywords:      "a,b,c",
 			Latitude:      "40.123",
 			Longitude:     "11.11",
+			AlbumKey:      "album1",
 		},
 		{
 			builtFilename: "fname3",
@@ -65,10 +88,11 @@ func Test_writeToCSV(t *testing.T) {
 			Keywords:      "a,b,c",
 			Latitude:      "40.123",
 			Longitude:     "11.11",
+			AlbumKey:      "album1",
 		},
 	}
 
-	w.writeToCSV(images, "test")
+	w.writeImagesToCSV(images, "test")
 
 	f, err := os.Open(fpath)
 	if err != nil {
