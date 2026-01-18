@@ -62,6 +62,11 @@ func Test_writeImagesToCSV(t *testing.T) {
 		},
 	}
 
+	alb := album{
+		AlbumKey: "testAlbum",
+	}
+	alb.Uris.HighlightImage.URI = "/api/v2/image/highlight123-0"
+
 	images := []albumImage{
 		{
 			builtFilename: "fname1",
@@ -71,6 +76,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 			Latitude:      "40.123",
 			Longitude:     "11.11",
 			AlbumKey:      "album1",
+			ImageKey:      "highlight123",
 		},
 		{
 			builtFilename: "fname2",
@@ -80,6 +86,7 @@ func Test_writeImagesToCSV(t *testing.T) {
 			Latitude:      "40.123",
 			Longitude:     "11.11",
 			AlbumKey:      "album1",
+			ImageKey:      "image2",
 		},
 		{
 			builtFilename: "fname3",
@@ -89,10 +96,11 @@ func Test_writeImagesToCSV(t *testing.T) {
 			Latitude:      "40.123",
 			Longitude:     "11.11",
 			AlbumKey:      "album1",
+			ImageKey:      "image3",
 		},
 	}
 
-	w.writeImagesToCSV(images, "test")
+	w.writeImagesToCSV(images, alb, "test")
 
 	f, err := os.Open(fpath)
 	if err != nil {

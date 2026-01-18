@@ -36,6 +36,7 @@ var albumsCsvHeader = []string{
 	"PasswordHint",
 	"Protected",
 	"HighlightImageUri",
+	"HighlightImageKey",
 }
 
 var imagesCsvHeader = []string{
@@ -43,6 +44,7 @@ var imagesCsvHeader = []string{
 	"Type",
 	"AlbumKey",
 	"AlbumPath",
+	"IsHighlight",
 	"ImageKey",
 	"Title",
 	"Caption",
@@ -123,21 +125,26 @@ func (w *Worker) buildAlbumMetadata(a album) []string {
 		a.PasswordHint,
 		strconv.FormatBool(a.Protected),
 		a.HighlightImageUri(),
+		a.HighlightImageKey(),
 	}
 }
 
 // buildImageMetadata returns the data to be added to the images metadata CSV file
-func (w *Worker) buildImageMetadata(a albumImage, folder string) []string {
+func (w *Worker) buildImageMetadata(a albumImage, alb album, folder string) []string {
 	ftype := "image"
 	if a.IsVideo {
 		ftype = "video"
 	}
+	
+	// Check if this image is the album highlight
+	isHighlight := a.ImageKey == alb.HighlightImageKey()
 
 	return []string{
 		fmt.Sprintf("%s/%s", folder, a.Name()),
 		ftype,
 		a.AlbumKey,
 		a.AlbumPath,
+		strconv.FormatBool(isHighlight),
 		a.ImageKey,
 		a.Title,
 		a.Caption,
@@ -194,7 +201,7 @@ func (w *Worker) writeAlbumToCSV(alb album) {
 }
 
 // writeImagesToCSV writes images metadata to CSV file
-func (w *Worker) writeImagesToCSV(images []albumImage, folder string) {
+func (w *Worker) writeImagesToCSV(images []albumImage, alb album, folder string) {
 	w.csvLock.Lock()
 	defer w.csvLock.Unlock()
 
@@ -214,7 +221,7 @@ func (w *Worker) writeImagesToCSV(images []albumImage, folder string) {
 	}()
 
 	for _, img := range images {
-		if err := writer.Write(w.buildImageMetadata(img, folder)); err != nil {
+		if err := writer.Write(w.buildImageMetadata(img, alb, folder)); err != nil {
 			log.Errorf("cannot write to images metadata CSV file: %v", err)
 		}
 	}

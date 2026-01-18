@@ -3,6 +3,7 @@ package smugmug
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -72,6 +73,28 @@ type album struct {
 // HighlightImageUri returns the URI of the highlight image for this album
 func (a album) HighlightImageUri() string {
 	return a.Uris.HighlightImage.URI
+}
+
+// HighlightImageKey extracts the image key from the highlight image URI
+// URI format: /api/v2/image/{ImageKey}-{version}
+func (a album) HighlightImageKey() string {
+	uri := a.Uris.HighlightImage.URI
+	if uri == "" {
+		return ""
+	}
+	// Extract ImageKey from URI like /api/v2/image/abc123-0!details
+	var imageKey string
+	_, err := fmt.Sscanf(uri, "/api/v2/image/%s", &imageKey)
+	if err != nil {
+		return ""
+	}
+	// Remove the version suffix (e.g., "-0" or "-1")
+	for i := len(imageKey) - 1; i >= 0; i-- {
+		if imageKey[i] == '-' {
+			return imageKey[:i]
+		}
+	}
+	return imageKey
 }
 
 type albumImagesResponse struct {

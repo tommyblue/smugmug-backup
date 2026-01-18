@@ -248,7 +248,7 @@ func (w *Worker) albumWorker(id int) {
 			w.saveImages(images, folder)
 			if w.cfg.WriteCSV {
 				w.writeAlbumToCSV(album)
-				w.writeImagesToCSV(images, folder)
+				w.writeImagesToCSV(images, album, folder)
 			}
 		}
 	}
