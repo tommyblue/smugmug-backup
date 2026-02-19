@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--
+- Removed `HighlightImageUri` and `HighlightImageKey` fields from `albums_metadata.csv` as they contained incorrect data (highlight node IDs instead of actual image keys). The correct highlight image identification is available in the `IsHighlight` field of `images_metadata.csv`.
 
 ### Removed
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
--
+- Fixed incorrect highlight/cover image identification in CSV export. The `IsHighlight` field in `images_metadata.csv` now correctly identifies the actual album cover image by properly parsing the SmugMug highlight node API response.
 
 ### Maintenance
 
