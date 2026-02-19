@@ -202,7 +202,7 @@ func (w *Worker) highlightImageKey(nodeId string) string {
 
 	// Try to extract ImageKey from various possible response structures
 
-	// Format 1: Direct Image.ImageKey
+	// Format 1: Direct Image.ImageKey (when API returns full image object)
 	if resp.Response.Image.ImageKey != "" {
 		log.Debugf("Found highlight ImageKey via Image.ImageKey: %s", resp.Response.Image.ImageKey)
 		return resp.Response.Image.ImageKey
@@ -216,22 +216,30 @@ func (w *Worker) highlightImageKey(nodeId string) string {
 
 	// Format 3: Extract from Uris.Image.URI (format: /api/v2/image/{ImageKey}-{version})
 	if resp.Response.Uris.Image.URI != "" {
-		return extractImageKeyFromURI(resp.Response.Uris.Image.URI)
+		key := extractImageKeyFromURI(resp.Response.Uris.Image.URI)
+		log.Debugf("Found highlight ImageKey via Uris.Image.URI: %s", key)
+		return key
 	}
 
 	// Format 4: Extract from Uris.AlbumImage.URI
 	if resp.Response.Uris.AlbumImage.URI != "" {
-		return extractImageKeyFromURI(resp.Response.Uris.AlbumImage.URI)
+		key := extractImageKeyFromURI(resp.Response.Uris.AlbumImage.URI)
+		log.Debugf("Found highlight ImageKey via Uris.AlbumImage.URI: %s", key)
+		return key
 	}
 
 	// Format 5: Extract from Image.URI
 	if resp.Response.Image.URI != "" {
-		return extractImageKeyFromURI(resp.Response.Image.URI)
+		key := extractImageKeyFromURI(resp.Response.Image.URI)
+		log.Debugf("Found highlight ImageKey via Image.URI: %s", key)
+		return key
 	}
 
 	// Format 6: Extract from HighlightImage.URI
 	if resp.Response.HighlightImage.URI != "" {
-		return extractImageKeyFromURI(resp.Response.HighlightImage.URI)
+		key := extractImageKeyFromURI(resp.Response.HighlightImage.URI)
+		log.Debugf("Found highlight ImageKey via HighlightImage.URI: %s", key)
+		return key
 	}
 
 	log.Debugf("Could not extract ImageKey from highlight node %s", nodeId)

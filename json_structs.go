@@ -223,7 +223,27 @@ func (a *albumImage) Name() string {
 
 type highlightNodeResponse struct {
 	Response struct {
-		// Try multiple possible response formats from SmugMug highlight node endpoint
+		// Endpoint type and locator info
+		EndpointType    string `json:"EndpointType"`
+		Locator         string `json:"Locator"`
+		LocatorType     string `json:"LocatorType"`
+		Uri             string `json:"Uri"`
+		UriDescription  string `json:"UriDescription"`
+		
+		// Full Image object (when API returns complete response)
+		Image struct {
+			ImageKey string `json:"ImageKey"`
+			URI      string `json:"Uri"`
+			FileName string `json:"FileName"`
+		} `json:"Image"`
+		
+		// Alternative: HighlightImage reference
+		HighlightImage struct {
+			ImageKey string `json:"ImageKey"`
+			URI      string `json:"Uri"`
+		} `json:"HighlightImage"`
+		
+		// URIs for related endpoints
 		Uris struct {
 			Image struct {
 				URI string `json:"Uri"`
@@ -232,16 +252,6 @@ type highlightNodeResponse struct {
 				URI string `json:"Uri"`
 			} `json:"AlbumImage"`
 		} `json:"Uris"`
-		// Alternative: direct image reference
-		Image struct {
-			ImageKey string `json:"ImageKey"`
-			URI      string `json:"Uri"`
-		} `json:"Image"`
-		// Alternative: HighlightImage reference
-		HighlightImage struct {
-			ImageKey string `json:"ImageKey"`
-			URI      string `json:"Uri"`
-		} `json:"HighlightImage"`
 	} `json:"Response"`
 }
 
