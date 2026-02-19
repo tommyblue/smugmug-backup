@@ -9,27 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Extended CSV metadata export with comprehensive data export in two separate files:
-  - `albums_metadata.csv`: Complete album information including AlbumKey, Title, Description, Keywords, Privacy, SecurityType, ImageCount, dates, WebUri, and more (20 fields)
-  - `images_metadata.csv`: Complete image/video information including filename, title, caption, format, dimensions, GPS coordinates, dates, and all technical metadata (31 fields)
-- Added extensive fields to album and albumImage structures to capture all available SmugMug API data
-- This provides a complete data export for users migrating away from SmugMug
+- **Complete SmugMug data export with two separate CSV files**:
+  - `albums_metadata.csv`: Complete album information with 19 fields including AlbumKey, Title, Description, Keywords, Privacy, SecurityType, ImageCount, dates, WebUri, and more
+  - `images_metadata.csv`: Complete image/video metadata with 32 fields including filename, title, caption, format, dimensions, GPS coordinates (Latitude, Longitude, Altitude), dates, and all technical metadata
+- Album metadata propagation to image records (AlbumTitle, AlbumDescription, AlbumKeywords, AlbumCreated, AlbumLastUpdated)
+- `IsHighlight` field in images CSV to identify album cover images by calling SmugMug API `/api/v2/highlight/node/{nodeId}`
+- Extended `album` struct with 17 new fields to capture all available SmugMug API data (AlbumKey, Title, Privacy, ImageCount, WebUri, HighlightImage, etc.)
+- Extended `albumImage` struct with 20 new fields (Title, Format, Width, Height, Size, Hidden, Watermarked, Collectable, etc.)
+- Comprehensive test coverage for dual-CSV system and highlight image detection
 
 ### Changed
 
+- CSV export architecture from single file (`metadata.csv` with 7 fields) to dual-CSV system (`albums_metadata.csv` + `images_metadata.csv` with 51 total fields)
 - Removed `HighlightImageUri` and `HighlightImageKey` fields from `albums_metadata.csv` as they contained incorrect data (highlight node IDs instead of actual image keys). The correct highlight image identification is available in the `IsHighlight` field of `images_metadata.csv`.
-
-### Removed
-
--
 
 ### Fixed
 
-- Fixed incorrect highlight/cover image identification in CSV export. The `IsHighlight` field in `images_metadata.csv` now correctly identifies the actual album cover image by properly parsing the SmugMug highlight node API response.
+- Fixed Altitude field type from string to int (matches SmugMug API response)
+- Fixed HighlightImageUri extraction from nested Uris structure
+- Fixed cover image identification logic to properly parse SmugMug highlight node API responses
 
 ### Maintenance
 
--
+- Updated README.md with complete CSV field documentation
+- Added `ISHIGHLIGHT_BUG.md` documenting the cover image identification investigation
 
 ## [v1.6.0](https://github.com/tommyblue/smugmug-backup/tree/v1.6.0) - 2024-12-13
 
