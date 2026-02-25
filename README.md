@@ -20,7 +20,6 @@ With a good internet connection, a full backup of ~200GB can be completed in aro
   - [Credentials](#credentials)
     - [Obtain API keys](#obtain-api-keys)
     - [Obtain Tokens](#obtain-tokens)
-      - [Alternative ways to obtain the tokens](#alternative-ways-to-obtain-the-tokens)
   - [Build and install](#build-and-install)
   - [Debug for errors](#debug-for-errors)
   - [Visualize software stats](#visualize-software-stats)
@@ -123,27 +122,6 @@ Add them to the `authentication` section of the configuration file:
 user_token = "<User Token>"
 user_secret = "<User Secret>"
 ```
-
-#### Alternative ways to obtain the tokens
-
-Based on the examples from SmugMug (that you can find in the [get_tokens](./get_tokens) folder,
-I've written a small web app that can help everyone to obtain their user token and secret.
-
-The app has its own [GitHub repo](https://github.com/tommyblue/smugmug-api-authenticator) and a live
-version is deployed to heroku at
-[https://smugmug-api-authenticator.herokuapp.com/](https://smugmug-api-authenticator.herokuapp.com/).  
-You can use that app, it doesn't store any personal data in the server, but (as you should) you
-don't trust me, you can easily clone the
-[GitHub repo](https://github.com/tommyblue/smugmug-api-authenticator), check the code, run the
-app locally and get the tokens.
-
-If you prefer to use the console, the `get_tokens` folder contains a script from SmugMug to obtain
-the OAuth1 tokens.
-You need to create a `config.json` file with your API key/secret using `example.json` as example.
-Then, using a python3 environment, run `run-console.sh`.
-The script will show you a link you must open with your browser. SmugMug will give you a 6-digit
-code you must then paste to the console prompt.
-That's the last step, the console will show the user token and secret
 
 ## Build and install
 

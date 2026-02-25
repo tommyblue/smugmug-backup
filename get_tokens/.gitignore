@@ -1,5 +1,0 @@
-ENV
-__pycache__
-config.json
-!example.json
-.mypy_cache
