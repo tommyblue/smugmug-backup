@@ -6,11 +6,11 @@ import "github.com/sirupsen/logrus"
 // level to Panic). It returns a function which when called, resets it to its
 // previous level. Its useful to be called as follows in test/benchmarks:
 //
-//  func TestFoo(t *testing.T) {
-//      defer DisableLogging()()
+//	func TestFoo(t *testing.T) {
+//	    defer DisableLogging()()
 //
-//      // logging is set to Panic for the whole test
-//  }
+//	    // logging is set to Panic for the whole test
+//	}
 func DisableLogging() (reset func()) {
 	lvl := logrus.GetLevel()
 	logrus.SetLevel(logrus.PanicLevel)
@@ -21,11 +21,11 @@ func DisableLogging() (reset func()) {
 // level to Error). It returns a function which when called, resets it to its
 // previous level. Its useful to be called as follows in test/benchmarks:
 //
-//  func TestFoo(t *testing.T) {
-//      defer LessLogging()()
+//	func TestFoo(t *testing.T) {
+//	    defer LessLogging()()
 //
-//      // logging is set to Error for the whole test
-//  }
+//	    // logging is set to Error for the whole test
+//	}
 func LessLogging() (reset func()) {
 	lvl := logrus.GetLevel()
 	logrus.SetLevel(logrus.ErrorLevel)
