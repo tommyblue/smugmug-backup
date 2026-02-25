@@ -109,7 +109,7 @@ func (x *Context) URLParam(key string) string {
 // RoutePattern builds the routing pattern string for the particular
 // request, at the particular point during routing. This means, the value
 // will change throughout the execution of a request in a router. That is
-// why its advised to only use this value after calling the next handler.
+// why it's advised to only use this value after calling the next handler.
 //
 // For example,
 //
@@ -121,6 +121,9 @@ func (x *Context) URLParam(key string) string {
 //		})
 //	}
 func (x *Context) RoutePattern() string {
+	if x == nil {
+		return ""
+	}
 	routePattern := strings.Join(x.RoutePatterns, "")
 	routePattern = replaceWildcards(routePattern)
 	if routePattern != "/" {
@@ -130,11 +133,12 @@ func (x *Context) RoutePattern() string {
 	return routePattern
 }
 
-// replaceWildcards takes a route pattern and recursively replaces all
-// occurrences of "/*/" to "/".
+// replaceWildcards takes a route pattern and replaces all occurrences of
+// "/*/" with "/". It iteratively runs until no wildcards remain to
+// correctly handle consecutive wildcards.
 func replaceWildcards(p string) string {
-	if strings.Contains(p, "/*/") {
-		return replaceWildcards(strings.Replace(p, "/*/", "/", -1))
+	for strings.Contains(p, "/*/") {
+		p = strings.ReplaceAll(p, "/*/", "/")
 	}
 	return p
 }

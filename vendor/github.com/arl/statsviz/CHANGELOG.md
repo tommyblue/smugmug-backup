@@ -1,3 +1,37 @@
+v0.8.0 / 2025-11-21
+==============
+  * UI/UX improvments:
+    - performance/fluidity improvements
+    - Alt+Click to show only the clicked category
+    - add plot search/filter bar
+    - fix visual glitches when resizing browser
+
+v0.7.3 / 2025-11-18
+==============
+  * internal/plot: add goroutines plot for !go1.26 (#145)
+  * Frontend rendering optimizations (#144)
+  * Add go1.26 plots cleanup+finalizer queues (#143)
+  * Add a bunch of other go1.26 plots (#142)
+  * Add plots for Go 1.26 scheduler pause metrics (#140)
+
+v0.7.2 / 2025-10-07
+==============
+  * Server zero value dont panic on register (#136)
+  * Add zerovalue example
+
+v0.7.1 / 2025-08-18
+==============
+  * _example: bump dependencies (#129)
+
+v0.7.0 / 2025-07-26
+==============
+  * New plots showing new go1.22 runtime/metrics:
+    + GC Memory Summary
+    + CPU (Garbage Collector)
+  * Frontend redesign/refactor:
+    + Maximize plot button
+    + plot category selector
+
 v0.6.0 / 2023-10-08
 ==============
   * New plots showing new go1.20/go1.21 runtime/metrics: (#111)

@@ -33,7 +33,7 @@ func downsampleBuckets(h *metrics.Float64Histogram, factor int) []float64 {
 	var ret []float64
 	vals := h.Buckets[1:]
 
-	for i := 0; i < len(vals); i++ {
+	for i := range vals {
 		if (i+1)%factor == 0 {
 			ret = append(ret, vals[i])
 		}
@@ -73,7 +73,7 @@ func downsampleCounts(h *metrics.Float64Histogram, factor int, slice []uint64) [
 	slice = slice[:0]
 
 	var sum uint64
-	for i := 0; i < len(vals); i++ {
+	for i := range vals {
 		if i%factor == 0 && i > 1 {
 			slice = append(slice, sum)
 			sum = vals[i]
@@ -84,4 +84,12 @@ func downsampleCounts(h *metrics.Float64Histogram, factor int, slice []uint64) [
 
 	// Whatever sum remains, it goes to the last bucket.
 	return append(slice, sum)
+}
+
+func floatseq(n int) []float64 {
+	seq := make([]float64, n)
+	for i := range n {
+		seq[i] = float64(i)
+	}
+	return seq
 }

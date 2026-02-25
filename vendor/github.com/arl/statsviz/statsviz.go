@@ -1,16 +1,17 @@
 // Package statsviz allows visualizing Go runtime metrics data in real time in
 // your browser.
 //
-// Register a Statsviz HTTP handlers with your server's [http.ServeMux]
+// Register Statsviz HTTP handlers with your server's [http.ServeMux]
 // (preferred method):
 //
 //	mux := http.NewServeMux()
 //	statsviz.Register(mux)
 //
-// Alternatively, you can register with [http.DefaultServeMux]:
+// Alternatively, you can register with [http.DefaultServeMux]
+// though you shouldn't do that in production:
 //
-//	ss := statsviz.Server{}
-//	s.Register(http.DefaultServeMux)
+//	ss := statsviz.NewServer()
+//	ss.Register(http.DefaultServeMux)
 //
 // By default, Statsviz is served at http://host:port/debug/statsviz/. This, and
 // other settings, can be changed by passing some [Option] to [NewServer].
@@ -27,7 +28,7 @@
 //
 // # Advanced usage:
 //
-// If you want more control over Statsviz HTTP handlers, examples are:
+// If you want more control over Statsviz HTTP handlers, for examples if:
 //   - you're using some HTTP framework
 //   - you want to place Statsviz handler behind some middleware
 //
@@ -41,13 +42,13 @@ package statsviz
 
 import (
 	"bytes"
-	"encoding/json"
+	"context"
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -65,10 +66,12 @@ const (
 //
 // RegisterDefault should not be used in production.
 func RegisterDefault(opts ...Option) error {
-	return Register(http.DefaultServeMux)
+	return Register(http.DefaultServeMux, opts...)
 }
 
 // Register registers the Statsviz HTTP handlers on the provided mux.
+//
+// Register must be called once per application.
 func Register(mux *http.ServeMux, opts ...Option) error {
 	srv, err := NewServer(opts...)
 	if err != nil {
@@ -85,9 +88,15 @@ func Register(mux *http.ServeMux, opts ...Option) error {
 //   - The Ws handler establishes a WebSocket connection allowing the connected
 //     browser to receive metrics updates from the server.
 //
-// The zero value is not a valid Server, use NewServer to create a valid one.
+// The zero value is a valid Server, with default options.
+//
+// NOTE: Having more than one Server in the same program is not supported (and
+// is not useful anyway).
 type Server struct {
-	intv      time.Duration // interval between consecutive metrics emission
+	cancel  context.CancelFunc // terminate goroutines
+	clients *clients           // connected websocket clients
+
+	interval  time.Duration // interval between consecutive metrics emission
 	root      string        // HTTP path root
 	plots     *plot.List    // plots shown on the user interface
 	userPlots []plot.UserPlot
@@ -100,23 +109,75 @@ type Server struct {
 // with some HTTP server. You can either use the Register method or register yourself
 // the Index and Ws handlers.
 func NewServer(opts ...Option) (*Server, error) {
-	s := &Server{
-		intv: defaultSendInterval,
-		root: defaultRoot,
+	var s Server
+	if err := s.init(opts...); err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
+
+func (s *Server) init(opts ...Option) error {
+	*s = Server{
+		interval: defaultSendInterval,
+		root:     defaultRoot,
 	}
 
 	for _, opt := range opts {
 		if err := opt(s); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	pl, err := plot.NewList(s.userPlots)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	s.plots = pl
-	return s, nil
+
+	ctx, cancel := context.WithCancel(context.Background())
+	s.cancel = cancel
+	s.clients = newClients(ctx, s.plots.Config())
+
+	// Collect metrics.
+	go func() {
+		tick := time.NewTicker(s.interval)
+		defer tick.Stop()
+		defer cancel()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-tick.C:
+				buf := bytes.Buffer{}
+				if _, err := s.plots.WriteTo(&buf); err != nil {
+					dbglog("failed to collect metrics: %v", err)
+					return
+				}
+				s.clients.broadcast(buf.Bytes())
+			}
+		}
+	}()
+
+	return nil
+}
+
+// Register registers the Statsviz HTTP handlers on the provided mux.
+//
+// Register must be called once per application.
+func (s *Server) Register(mux *http.ServeMux) {
+	if s.plots == nil {
+		s.init()
+	}
+
+	mux.Handle(s.root+"/", s.Index())
+	mux.HandleFunc(s.root+"/ws", s.Ws())
+}
+
+// Close releases all resources used by the Server.
+func (s *Server) Close() error {
+	s.cancel()
+	return nil
 }
 
 // Option is a configuration option for the Server.
@@ -129,7 +190,7 @@ func SendFrequency(intv time.Duration) Option {
 		if intv <= 0 {
 			return fmt.Errorf("frequency must be a positive integer")
 		}
-		s.intv = intv
+		s.interval = intv
 		return nil
 	}
 }
@@ -138,7 +199,7 @@ func SendFrequency(intv time.Duration) Option {
 // The default is "/debug/statsviz".
 func Root(path string) Option {
 	return func(s *Server) error {
-		s.root = path
+		s.root = strings.TrimSuffix(path, "/")
 		return nil
 	}
 }
@@ -152,132 +213,62 @@ func TimeseriesPlot(tsp TimeSeriesPlot) Option {
 	}
 }
 
-// Register registers the Statsviz HTTP handlers on the provided mux.
-func (s *Server) Register(mux *http.ServeMux) {
-	mux.Handle(s.root+"/", s.Index())
-	mux.HandleFunc(s.root+"/ws", s.Ws())
-}
-
-// intercept is a middleware that intercepts requests for plotsdef.js, which is
-// generated dynamically based on the plots configuration. Other requests are
-// forwarded as-is.
-func intercept(h http.Handler, cfg *plot.Config) http.HandlerFunc {
-	buf := bytes.Buffer{}
-	buf.WriteString("export default ")
-	enc := json.NewEncoder(&buf)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(cfg); err != nil {
-		panic("unexpected failure to encode plot definitions: " + err.Error())
-	}
-	buf.WriteString(";")
-	plotsdefjs := buf.Bytes()
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "js/plotsdef.js" {
-			w.Header().Add("Content-Length", strconv.Itoa(buf.Len()))
-			w.Header().Add("Content-Type", "text/javascript; charset=utf-8")
-			w.Write(plotsdefjs)
-			return
-		}
-
-		// Force Content-Type if needed.
-		if ct, ok := contentTypes[r.URL.Path]; ok {
-			w.Header().Add("Content-Type", ct)
-		}
-
-		h.ServeHTTP(w, r)
-	}
-}
-
-// contentTypes forces the Content-Type HTTP header for certain files of some
-// JavaScript libraries that have no extensions. Otherwise, the HTTP file server
-// would serve them with "Content-Type: text/plain".
-var contentTypes = map[string]string{
-	"libs/js/popperjs-core2": "text/javascript",
-	"libs/js/tippy.js@6":     "text/javascript",
-}
-
-// Returns an FS serving the embedded assets, or the assets directory if
-// STATSVIZ_DEBUG contains the 'asssets' key.
-func assetsFS() http.FileSystem {
-	assets := http.FS(static.Assets)
-
-	vdbg := os.Getenv("STATSVIZ_DEBUG")
-	if vdbg == "" {
-		return assets
-	}
-
-	kvs := strings.Split(vdbg, ";")
-	for _, kv := range kvs {
-		k, v, found := strings.Cut(strings.TrimSpace(kv), "=")
-		if !found {
-			panic("invalid STATSVIZ_DEBUG value: " + kv)
-		}
-		if k == "assets" {
-			dir := filepath.Join(v)
-			return http.Dir(dir)
-		}
-	}
-
-	return assets
-}
-
 // Index returns the index handler, which responds with the Statsviz user
 // interface HTML page. By default, the handler is served at the path specified
 // by the root. Use [WithRoot] to change the path.
 func (s *Server) Index() http.HandlerFunc {
-	prefix := strings.TrimSuffix(s.root, "/") + "/"
-	assets := http.FileServer(assetsFS())
-	handler := intercept(assets, s.plots.Config())
-
-	return http.StripPrefix(prefix, handler).ServeHTTP
+	prefix := s.root + "/"
+	dist := http.FileServerFS(static.Assets())
+	return http.StripPrefix(prefix, dist).ServeHTTP
 }
+
+func parseBoolEnv(name string) bool {
+	env := os.Getenv(name)
+	val, err := strconv.ParseBool(env)
+	if err != nil {
+		if env != "" {
+			fmt.Fprintf(os.Stderr, "statsviz: malformed %s %v\n", name, err)
+		}
+	}
+	return val
+}
+
+var debug = false
+
+func dbglog(format string, args ...any) {
+	if debug {
+		fmt.Fprintf(os.Stderr, "statsviz: "+format+"\n", args...)
+	}
+}
+
+var wsUpgrader = sync.OnceValue(func() websocket.Upgrader {
+	var checkOrigin func(r *http.Request) bool
+
+	// Allow all origins for testing.
+	if debug = parseBoolEnv("STATSVIZ_DEBUG"); debug {
+		// passthrough
+		checkOrigin = func(r *http.Request) bool { return true }
+	}
+
+	return websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 2048,
+		CheckOrigin:     checkOrigin,
+	}
+})
 
 // Ws returns the WebSocket handler used by Statsviz to send application
 // metrics. The underlying net.Conn is used to upgrade the HTTP server
 // connection to the WebSocket protocol.
 func (s *Server) Ws() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var upgrader = websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-		}
-
+		upgrader := wsUpgrader()
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
+			dbglog("failed to upgrade connection: %v", err)
 			return
 		}
-		defer ws.Close()
 
-		// Ignore this error. This happens when the other end connection closes,
-		// for example. We can't handle it in any meaningful way anyways.
-		_ = s.sendStats(ws, s.intv)
+		s.clients.add(ws)
 	}
-}
-
-// sendStats sends runtime statistics over the WebSocket connection.
-func (s *Server) sendStats(conn *websocket.Conn, frequency time.Duration) error {
-	tick := time.NewTicker(frequency)
-	defer tick.Stop()
-
-	// If the WebSocket connection is initiated by an already open web UI
-	// (started by a previous process, for example), then plotsdef.js won't be
-	// requested. Call plots.Config() manually to ensure that s.plots internals
-	// are correctly initialized.
-	s.plots.Config()
-
-	for range tick.C {
-		w, err := conn.NextWriter(websocket.TextMessage)
-		if err != nil {
-			return err
-		}
-		if err := s.plots.WriteValues(w); err != nil {
-			return err
-		}
-		if err := w.Close(); err != nil {
-			return err
-		}
-	}
-
-	panic("unreachable")
 }

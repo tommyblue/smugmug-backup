@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=en_US.UTF-8 \
@@ -18,12 +18,12 @@ RUN sed -e "/deb-src/d" -i /etc/apt/sources.list \
     && rm -rf /.root/cache \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://dl.google.com/go/go1.20.7.linux-amd64.tar.gz ./go.tar.gz
+ADD https://dl.google.com/go/go1.26.0.linux-amd64.tar.gz ./go.tar.gz
 
-RUN echo "f0a87f1bcae91c4b69f8dc2bc6d7e6bfcd7524fceec130af525058c0c17b1b44 go.tar.gz" | sha256sum -c - && \
+RUN echo "aac1b08a0fb0c4e0a7c1555beb7b59180b05dfc5a3d62e40e9de90cd42f88235 go.tar.gz" | sha256sum -c - && \
     tar -C /usr/local -xzf go.tar.gz && \
     rm ./go.tar.gz
 
 ADD . $APP
 WORKDIR $APP
-RUN go build -mod=vendor -i -v -o $GOBIN/smugmug-backup ./cmd/smugmug-backup/
+RUN go build -mod=vendor -v -o $GOBIN/smugmug-backup ./cmd/smugmug-backup/
