@@ -5,6 +5,8 @@
 Makes a full backup of a [SmugMug](https://www.smugmug.com/) account (images and videos
 are supported).
 
+## SINCE APRIL 2026 I AM NOT USING SMUGMUG ANYMORE, THE PROJECT IS CURRENTLY UNMAINTAINED
+
 The program loops over the images and videos of the user's albums and saves them in the destination
 folder, replicating the SmugMug paths.
 
