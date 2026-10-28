@@ -7,8 +7,8 @@ github.com/arl/statsviz/internal/static
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/go-chi/chi/v5 v5.2.5
-## explicit; go 1.22
+# github.com/go-chi/chi/v5 v5.4.0
+## explicit; go 1.24
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
 # github.com/go-viper/mapstructure/v2 v2.5.0
