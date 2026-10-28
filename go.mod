@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/arl/statsviz v0.8.0
-	github.com/go-chi/chi/v5 v5.2.5
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/viper v1.21.0
 )
